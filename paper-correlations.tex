@@ -19,6 +19,7 @@
 \newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
 % When cleveref fails to do its job
 \newcommand{\apref}[1]{Appendix \ref{#1}}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \begin{document}
 %*Corresponding author: Kirill M. Gerke, Tel.: +79661877715, E-mail: kg@ifz.ru,
@@ -67,7 +68,7 @@ the scan approach) calculates correlation functions along specified directions
 which can include axial and diagonal directions. The results of computations can
 be provided to the user separately for each requested direction or averaged over
 multiple directions. The latter approach (called the map approach) calculates a
-``correlation map'' which stores the values of a correlation function in all
+``correlation map'' which holds the values of a correlation function in all
 directions. The scan and map approaches are described in \cref{scansec} and
 \cref{mapsec} respectively.
 
@@ -270,7 +271,29 @@ The pore size correlation function $P(r)dr$ is defined as the probability that a
 randomly chosen point in the input array lies at a distance between
 $r$ and $r + dr$ from the nearest point on the pore-solid interface.
 
-As you can see this function cannot be obtained from one-dimensional slices.
+As you can see this function cannot be obtained from one-dimensional slices. We
+calculate it using distance transform. For each point $\bm{x}$ distance
+transform $\mathcal{D}(\bm{x})$ is defined as
+\begin{equation*}
+  \mathcal{D}(\bm{x})= \left\{
+  \begin{array}{ll}
+    0 & \quad \bm{x} \in \text{solid phase} \\
+    \argmin\limits_{y \in \text{solid phase}} \rho(\bm{x},\bm{y}) & \quad \text{otherwise}
+  \end{array}
+\right.
+\end{equation*}
+
+Our algorithm for calculating $P(r)$ for a two-phase system is the following:
+\begin{algorithmic}[1]
+  \Procedure{poresize}{$array, nbins$}
+    \State $d \gets dist(array)$ \Comment{$dist$ calculates
+      $\mathcal{D}(\bm{x})$ for each element of $array$}
+    \State $f(x) \gets x \ne 0$
+    \State $positive \gets filter(d, f)$
+    \State Bin values in $positive$ to $nbins$ bins to compute a histogram $H$
+    \State \textbf{return} $H$
+  \EndProcedure
+\end{algorithmic}
 
 \section{The map approach.}
 \label{mapsec}
