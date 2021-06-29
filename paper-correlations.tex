@@ -193,7 +193,7 @@ If $\chi(\bm{x})$ cannot be expressed in this way (what we call
 The array \code{total} is obtained in the same way as in $L_2$ function because
 it depends only on correlation lengths and the length of the input array.
 
-The efficiency of \code{s2sep} is $O(n\:log\,n)$ and efficiency of
+The efficiency of \code{s2sep} is $O(n\log n)$ and efficiency of
 \code{s2insep} is $O(n^2)$ where $n$ is the length of the array.
 
 \subsection{Cluster function}
@@ -265,7 +265,9 @@ one:
 \end{algorithmic}
 
 The edges are extracted by calculating $|S(array)|$ where $S$ is the Sobel
-operator. \textbf{TODO: Cite our first paper}.
+operator. \textbf{TODO: Cite our first paper}. Algorithmic efficiency of these
+algorithms are $O(n\log n)$ because it's implemented using \code{s2sep} and
+filtering to extract edges is $O(n)$.
 
 \subsection{Pore size function}
 The pore size correlation function $P(r)dr$ is defined as the probability that a
@@ -295,6 +297,8 @@ Our algorithm for calculating $P(r)$ for a two-phase system is the following:
     \State \textbf{return} $H$
   \EndProcedure
 \end{algorithmic}
+Algorithmic efficiency is $O(n)$ where $n$ is the number of elements in the
+input array.
 
 \subsection{Chord length function}
 The chord length function $p^{(i)}(\bm{r})d\bm{r}$ is defined as the probability of
@@ -302,7 +306,8 @@ finding a chord of length between $|\bm{r}|$ and $|\bm{r} + d\bm{r}|$ and
 paralled to $\bm{r}$ in phase $i$. A chords is a line segment between
 intersections of an infinitely long line with the interface of the phase
 $i$. This function, again, can be calculated by cutting slices from a
-multidimensional array. The algorithm is as follows:
+multidimensional array. The algorithm which works in $O(n)$ time where $n$ is
+the number of elements in the input is as follows:
 \begin{algorithmic}[1]
   \Procedure{chordlength}{$array, phase, nbins$}
     \State $lengths \gets [\quad]$
@@ -498,6 +503,78 @@ of Poisson process and smaller value of $s$.
     with theoretical values for overlapping disks (\cref{fig:ps-2d} and
     \cref{fig:cl-2d}) and balls(\cref{fig:ps-3d} and \cref{fig:cl-3d}).}
   \label{fig:pscl}
+\end{figure*}
+\twocolumngrid
+
+\section{Efficiency of our algorithms}
+
+To measure efficiecy of our algorithms we use a machine with the following
+configuration:
+\begin{itemize}
+\item \textbf{CPU}: AMD Ryzen 5 1600X running at 2200~MHz
+\item \textbf{Memory}: 32~Gb DDR4-2400 memory
+\item \textbf{GPU}: \textbf{Insert nvidia gpu here}
+\end{itemize}
+
+We generate two (resp. three) dimensional square (resp. cubic) binary arrays
+with different number of elements. The arrays are filled with thresholded value
+noise using \code{ValueNoise.jl} package and this code:
+\begin{verbatim}
+using ValueNoise
+
+getdata(side, dims :: Integer) =
+    getdata(side, Val(dims))
+
+getdata(side, :: Val{2}) =
+    [value_noise(5x/side,
+                 5y/side,
+                 0.0,
+                 5, 34365) < 0.5
+     for x in 1:side, y in 1:side]
+
+getdata(side, :: Val{3}) =
+    [value_noise(5x/side,
+                 5y/side,
+                 5z/side,
+                 5, 34365) < 0.5
+     for x in 1:side, y in 1:side, z in 1:side]
+\end{verbatim}
+An example of a two-dimensional image generated in this way is on
+\cref{fig:valuenoise}. The function \code{getdata} generates the same image
+sampled with different resolutions. For two-dimensional case we generate ten
+arrays with the side of a square $s = 1000, 2000, \dots, 10000$ pixels and
+measure execution time for each function. For three-dimensional case we measure
+execution time for ten cubic arrays with the side $s = 50, 100, \dots, 500$. The
+result for \code{Directional} module is on \cref{fig:timings}. All functions are
+calculated with default values of optional arguments (that is: closed walls
+boundary conditions and computation along axial directions).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.3\textwidth]{images/timing-image.png}
+  \caption[]{{\small An example of 2D image used in timing measurements}}
+  \label{fig:valuenoise}
+\end{figure}
+
+\onecolumngrid
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/time-2d.png}
+    \caption[]{{\small Two-dimensional case}}
+    \label{fig:timings-2d}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/time-3d.png}
+    \caption[]{{\small Three-dimensional case}}
+    \label{fig:timings-3d}
+  \end{subfigure}
+  \caption[]{\small Execution times for different functions from
+    \code{Directional} module.}
+  \label{fig:timings}
 \end{figure*}
 \twocolumngrid
 
