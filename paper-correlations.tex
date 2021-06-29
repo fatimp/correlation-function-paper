@@ -541,13 +541,23 @@ getdata(side, :: Val{3}) =
 \end{verbatim}
 An example of a two-dimensional image generated in this way is on
 \cref{fig:valuenoise}. The function \code{getdata} generates the same image
-sampled with different resolutions. For two-dimensional case we generate ten
-arrays with the side of a square $s = 1000, 2000, \dots, 10000$ pixels and
-measure execution time for each function. For three-dimensional case we measure
-execution time for ten cubic arrays with the side $s = 50, 100, \dots, 500$. The
-result for \code{Directional} module is on \cref{fig:timings}. All functions are
-calculated with default values of optional arguments (that is: closed walls
-boundary conditions and computation along axial directions).
+sampled with different resolutions.
+
+To measure efficiency of \code{Directional} module we generate ten arrays with
+a side of a square $s = 1000, 2000, \dots, 10000$ pixels for two-dimensional
+case and ten arrays with a side of a cube $s = 50, 100, \dots, 500$ voxels for
+three-dimensional case and calculate execution time for each function. All
+functions are calculated with default values of optional arguments (that is:
+closed walls boundary conditions and computation along axial directions).
+
+To measure efficiency of \code{Map} module we follow the same procedure but with
+seven arrays usings squares with a side $s = 1000, 2000, \dots, 7000$ pixels and
+cubes with a side $s = 50, 100, \dots, 350$ voxels.
+
+The measurements of execution time is on \cref{fig:timings}.
+
+\textbf{TODO: alogithmic efficiency for two and three dimensions as a function
+  of number of elements.}
 
 \begin{figure}[ht]
   \centering
@@ -562,18 +572,31 @@ boundary conditions and computation along axial directions).
   \begin{subfigure}[b]{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/time-2d.png}
-    \caption[]{{\small Two-dimensional case}}
+    \caption[]{{\small Two-dimensional case, module \code{Directional}}}
     \label{fig:timings-2d}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/time-3d.png}
-    \caption[]{{\small Three-dimensional case}}
+    \caption[]{{\small Three-dimensional case, module \code{Directional}}}
     \label{fig:timings-3d}
   \end{subfigure}
-  \caption[]{\small Execution times for different functions from
-    \code{Directional} module.}
+    \vskip\baselineskip
+  \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/time-2d-map.png}
+    \caption[]{{\small Two-dimensional case, module \code{Map}}}
+    \label{fig:timings-2d-map}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/time-3d-map.png}
+    \caption[]{{\small Three-dimensional case, module \code{Map}}}
+    \label{fig:timings-3d-map}
+  \end{subfigure}
+  \caption[]{\small Execution times for different correlation functions.}
   \label{fig:timings}
 \end{figure*}
 \twocolumngrid
