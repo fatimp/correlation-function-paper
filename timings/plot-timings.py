@@ -4,28 +4,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 names2d = [
-    'l2-2d.dat', 's2-2d.dat',
-    'surfsurf-2d.dat', 'surfvoid-2d.dat',
-    'pore_size-2d.dat', 'chord_length-2d.dat'
+    'gpu/s2-2d.dat',
+    'gpu/surfsurf-2d.dat',
+    'gpu/surfvoid-2d.dat',
+    'gpu/c2-2d.dat',
 ]
 
 names3d = [
-    'l2-3d.dat', 's2-3d.dat',
-    'surfsurf-3d.dat', 'surfvoid-3d.dat',
-    'pore_size-3d.dat', 'chord_length-3d.dat'
+    'gpu/s2-3d.dat',
+    'gpu/surfsurf-3d.dat',
+    'gpu/surfvoid-3d.dat',
+    'gpu/c2-3d.dat',
 ]
 
 markers = [
-    '.', 'o', 's', 'p', '^', 'v'
+    '.', 'o', 's', 'p'
 ]
 
 data2d = [np.loadtxt(name) for name in names2d]
 data3d = [np.loadtxt(name) for name in names3d]
 
 labels = [
-    'Lineal-path function', 'Two-point function',
-    'Surface-surface function', 'Surface-void function',
-    'Pore size function', 'Chord length function'
+    'Two-point function',
+    'Surface-surface function',
+    'Surface-void function',
+    'Cluster function'
 ]
 
 plt.figure(dpi = 300)

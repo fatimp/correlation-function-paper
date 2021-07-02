@@ -513,7 +513,7 @@ configuration:
 \begin{itemize}
 \item \textbf{CPU}: AMD Ryzen 5 1600X running at 2200~MHz
 \item \textbf{Memory}: 32~Gb DDR4-2400 memory
-\item \textbf{GPU}: \textbf{Insert nvidia gpu here}
+\item \textbf{GPU}: Nvidia GeForce GTX 1650 with 4~Gb video memory
 \end{itemize}
 
 We generate two (resp. three) dimensional square (resp. cubic) binary arrays
@@ -552,9 +552,23 @@ closed walls boundary conditions and computation along axial directions).
 
 To measure efficiency of \code{Map} module we follow the same procedure but with
 seven arrays usings squares with a side $s = 1000, 2000, \dots, 7000$ pixels and
-cubes with a side $s = 50, 100, \dots, 350$ voxels.
+cubes with a side $s = 50, 100, \dots, 350$ voxels. The surface-void correlation
+functions on \cref{fig:timings-2d-gpu} and \cref{fig:timings-3d-gpu} are
+calculates with a lesser number of sides because it's too demanding in video
+memory.
 
-The measurements of execution time is on \cref{fig:timings}.
+Also many functions in \code{Map} module can utilize Nvidia's GPUs using the
+CUDA library. For example, two-point correlation function uses FFT transform
+optimized for Nvidia GPUs and provided in \code{CUDA.FFT} package. The choice
+between CPU or GPU version is made depending on type of input array. If it's
+\code{CuArray} rather than generic \code{AbstractArray} then CUDA implementation
+is chosen.
+
+The measurements of execution time is on \cref{fig:timings}. As you can see, GPU
+versions (when available) are faster than CPU versions and limited only by
+amount of video memory. Functions in \code{Directional} are slower (with
+exception of the lineal-path function) but are also useful in media
+reconstruction algorithms which utilize simulated annealing.
 
 \begin{figure}[ht]
   \centering
@@ -579,19 +593,33 @@ The measurements of execution time is on \cref{fig:timings}.
     \caption[]{{\small Three-dimensional case, module \code{Directional}}}
     \label{fig:timings-3d}
   \end{subfigure}
-    \vskip\baselineskip
+  \vskip\baselineskip
   \begin{subfigure}[b]{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/time-2d-map.png}
-    \caption[]{{\small Two-dimensional case, module \code{Map}}}
+    \caption[]{{\small Two-dimensional case, module \code{Map}, CPU}}
     \label{fig:timings-2d-map}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/time-3d-map.png}
-    \caption[]{{\small Three-dimensional case, module \code{Map}}}
+    \caption[]{{\small Three-dimensional case, module \code{Map}, CPU}}
     \label{fig:timings-3d-map}
+  \end{subfigure}
+  \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/time-2d-gpu.png}
+    \caption[]{{\small Two-dimensional case, module \code{Map}, GPU}}
+    \label{fig:timings-2d-gpu}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/time-3d-gpu.png}
+    \caption[]{{\small Three-dimensional case, module \code{Map}, GPU}}
+    \label{fig:timings-3d-gpu}
   \end{subfigure}
   \caption[]{\small Execution times for different correlation functions.}
   \label{fig:timings}
