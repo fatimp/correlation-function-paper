@@ -513,35 +513,30 @@ configuration:
 \begin{itemize}
 \item \textbf{CPU}: AMD Ryzen 5 1600X running at 2200~MHz
 \item \textbf{Memory}: 32~Gb DDR4-2400 memory
-\item \textbf{GPU}: Nvidia GeForce GTX 1650 with 4~Gb video memory
+\item \textbf{GPU}: Nvidia Tesla V100 with 32~Gb video memory
 \end{itemize}
 
 We generate two (resp. three) dimensional square (resp. cubic) binary arrays
-with different number of elements. The arrays are filled with thresholded value
-noise using \code{ValueNoise.jl} package and this code:
-\begin{verbatim}
-using ValueNoise
-
-getdata(side, dims :: Integer) =
-    getdata(side, Val(dims))
-
-getdata(side, :: Val{2}) =
-    [value_noise(5x/side,
-                 5y/side,
-                 0.0,
-                 5, 34365) < 0.5
-     for x in 1:side, y in 1:side]
-
-getdata(side, :: Val{3}) =
-    [value_noise(5x/side,
-                 5y/side,
-                 5z/side,
-                 5, 34365) < 0.5
-     for x in 1:side, y in 1:side, z in 1:side]
-\end{verbatim}
-An example of a two-dimensional image generated in this way is on
-\cref{fig:valuenoise}. The function \code{getdata} generates the same image
-sampled with different resolutions.
+with different number of elements. Each element $a_{ij}$ (resp. $a_{ijk}$) of a
+two-dimensional (resp. three-dimensional) array is calculated as follows:
+\begin{align*}
+  a_{ij} & = \left\{
+  \begin{array}{ll}
+    0 & \quad vn(5i/s, 5j/s, 0, 5, 34365) < 0.5 \\
+    1 & \quad \text{otherwise}
+  \end{array}
+  \right. \\
+  a_{ijk} & = \left\{
+  \begin{array}{ll}
+    0 & \quad vn(5i/s, 5j/s, 5k/s, 5, 34365) < 0.5 \\
+    1 & \quad \text{otherwise}
+  \end{array}
+  \right.
+\end{align*}
+Here $vn(x,y,z,o,s)$ is a value noise function. We fix a number of
+octaves $o = 5$ and a random seed $s = 34365$. The particular implementation for
+our measurements was taken from \code{ValueNoise.jl} package. An example of a
+two-dimensional image generated in this way is on \cref{fig:valuenoise}.
 
 To measure efficiency of \code{Directional} module we generate ten arrays with
 a side of a square $s = 1000, 2000, \dots, 10000$ pixels for two-dimensional
@@ -550,24 +545,18 @@ three-dimensional case and calculate execution time for each function. All
 functions are calculated with default values of optional arguments (that is:
 closed walls boundary conditions and computation along axial directions).
 
-To measure efficiency of \code{Map} module we follow the same procedure but with
-seven arrays usings squares with a side $s = 1000, 2000, \dots, 7000$ pixels and
-cubes with a side $s = 50, 100, \dots, 350$ voxels. The surface-void correlation
-functions on \cref{fig:timings-2d-gpu} and \cref{fig:timings-3d-gpu} are
-calculates with a lesser number of sides because it's too demanding in video
-memory.
-
-Also many functions in \code{Map} module can utilize Nvidia's GPUs using the
-CUDA library. For example, two-point correlation function uses FFT transform
-optimized for Nvidia GPUs and provided in \code{CUDA.FFT} package. The choice
-between CPU or GPU version is made depending on type of input array. If it's
-\code{CuArray} rather than generic \code{AbstractArray} then CUDA implementation
-is chosen.
+With the \code{Map} module we follow the same procedure. Many functions in
+\code{Map} can utilize Nvidia's GPUs using the CUDA library. For example,
+two-point correlation function uses FFT transform optimized for Nvidia GPUs and
+provided in \code{CUDA.FFT} package. We provide execution times for bot CPU and
+GPU. The choice between CPU or GPU version is made depending on type of input
+array. If it's \code{CuArray} rather than generic \code{AbstractArray} then CUDA
+implementation is chosen.
 
 The measurements of execution time is on \cref{fig:timings}. As you can see, GPU
 versions (when available) are faster than CPU versions and limited only by
 amount of video memory. Functions in \code{Directional} are slower (with
-exception of the lineal-path function) but are also useful in media
+exception of the lineal-path function) but are also useful in medium
 reconstruction algorithms which utilize simulated annealing.
 
 \begin{figure}[ht]
