@@ -17,6 +17,7 @@ jobs:
         with:
           root_file: paper-correlations.aux
           compiler: bibtex
+          args:
       - name: Compile LaTeX document (stage 2)
         uses: dante-ev/latex-action@latest
         with:
