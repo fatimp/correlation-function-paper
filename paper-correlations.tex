@@ -27,26 +27,157 @@
 %Address: Schmidt Institute of Physics of the Earth of Russian Academy of
 %Sciences, Bolshaya Gruzinskaya str. 10/1, Moscow, 123242, Russia
 \author{Vasily Postnicov}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of Sciences, Moscow, 123242, Russia}
+\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
+  Sciences, Moscow, 123242, Russia}
 \author{Alexey I. Samarin}
-\altaffiliation{Computational Mathematics and Cybernetics, Lomonosov Moscow State University, Moscow, 119991, Russia}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of Sciences, Moscow, 123242, Russia}
-\author{Marina V. Karsanina}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of Sciences, Moscow, 123242, Russia}
+\altaffiliation{Computational Mathematics and Cybernetics, Lomonosov Moscow
+  State University, Moscow, 119991, Russia}
+\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
+  Sciences, Moscow, 123242, Russia}
 \author{Efim V. Lavrukhin}
-\altaffiliation{Computational Mathematics and Cybernetics, Lomonosov Moscow State University, Moscow, 119991, Russia}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of Sciences, Moscow, 123242, Russia}
+\altaffiliation{Computational Mathematics and Cybernetics, Lomonosov Moscow
+  State University, Moscow, 119991, Russia}
+\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
+  Sciences, Moscow, 123242, Russia}
+\author{Marina V. Karsanina}
+\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
+  Sciences, Moscow, 123242, Russia}
+\author{Mathieu Gravey}
+\altaffiliation{University of Lausanne, Faculty of Geosciences and Environment,
+  Institute of Earth Surface Dynamics, Lausanne, Switzerland}
 \author{Kirill M. Gerke}
 \email[E-mail:]{kg@ifz.ru}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of Sciences, Moscow, 123242, Russia}
+\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
+  Sciences, Moscow, 123242, Russia}
 
-\title{Something about correlation functions}
+\title{Evaluation of classical correlation functions from 2/3D images on CPU and
+  GPU architectures: introducing CorrelationFunctions.jl}
 
 \begin{abstract}
   What have we done?
 \end{abstract}
 
 \maketitle
+
+\section{Background and motivation}
+Materials are ubiquitous both in nature and in industrial human activities, and
+their physical properties are interconnected to
+structure\cite{Torq_book}\cite{Sahimi_book}\cite{Adler_book}. The information
+about the structure usually comes in the way of 2D and 3D images obtained by
+microscopy, tomography and other related methodologies. This structural
+information can be used for numerous types of analysis, including simulations of
+different processes within studied materials or evaluation of their properties
+using so-called pore-scale modelling. Unlike computational modelling techniques
+a whole class of approximate methods exists including (rigorous) bounds that
+allows very fast estimations of physical properties albeit the bounds themselves
+are too wide to be applicable in majority of practical problems. Nonetheless, it
+is noteworthy that such bounds are originally based on structural descriptors in
+the form of correlation functions.
+
+Two ways exist to obtain correlation functions for a given structure at hand:
+measure them either experimentally with the help of scattering intensity or
+from digital images. None is perfect, as the first approach suffers from the
+limitation of CFs that can be obtained this way, while the second one provides
+information with limited resolution or/and resolution to field-of-view ratio. In
+addition to the resolution conundrum, the most useful imaging methods such as
+X-ray computed tomography (XCT) and scanning electron microscopy (SEM) provide
+gray-scale images (e.g., X-ray attenuation or electron back-scattering
+distributions) due to their underlying physical principles and require labeling
+of constituent phases (this is called segmentation) before computation of
+CFs. If properly segmented, high-resolution digital images do provide a
+possibility to compute any correlation function and, thus, possibility to
+address numerous fundamental and practical research problems.
+
+Correlation functions (CFs) as invaluable universal descriptors of structure are
+utilized in a multitude of scientific disciplines: material sciences, rock
+physics, soil physics and hydrology, cosmology and food engineering, biology and
+many others. Computed from 2D and 3D images, CFs can be applied to:
+\begin{enumerate}
+  \item to characterize the morphology and representativeness via correlation
+    lengths;
+  \item to perform stochastic reconstructions from experimentally measured CFs
+    or 2D to 3D reconstructions based on CFs that can be extracted from less
+    dimensions or through penetrable sphere model;
+  \item compare different structures to each other, including verification of
+    stochastic reconstructions;
+  \item compress structural information in the form of raw or parameterized CFs
+    with the possibility to recover the structure using stochastic
+    reconstruction
+  \item describe structural dynamics under different boundary conditions;
+  \item extract structural features for deep learning;
+  \item fuse multi-scale images and structural information as obtained by
+    different methods into a single digital model;
+  \item quantify spatial heterogeneity.
+\end{enumerate}
+
+Stochastic reconstruction is a separate huge topic, as this approach allows to
+solve an inverse problem and recover structure from known set of correlation
+functions. This ability for recovery serves as the basis for majority of usages
+in the list above. While it is necessary to compute CFs from digital images as a
+target set for stochastic reconstructions, they rely more on efficient
+recomputations or optimizations, e.g., re-evaluation during simulated
+annealing. Such optimizations are not the part of the computational package and
+are not considered in this work.
+
+There are different types of correlation functions that in general describe some
+probabilities. The main parameter of any correlation function is the number of
+points that are utilized to evaluate such a probability. While so-called
+$n$-point probability function\cite{Torq_book} will totally describe any
+structure in the limit of $n \rightarrow$ number of voxels/pixels on the image,
+computing or storing such a function is not practical. Based on information
+content, it was shown that increasing the number of point $n > 2$ only
+marginally improves the quality of the structure quantification and these
+improvements decay with increasing $n$. For stochastic reconstruction purposes
+computation of higher-order statistics will, arguably, not be balanced by
+increased number of points, but this is the topic of active research. For
+aforementioned reasons, we mainly focus on 2-point statistics, leaving the
+possibility to include higher order CFs in the future work. The simplest 2-point
+probability function ($S_2$ or autocorrelation) actually arise from small angle
+scattering experiments and measures the probability that both ends of line
+segment with a given length fall into the same phase. Other types include the
+probability of a whole line segment to fall into the phase ($L_2$ function) or
+to lie on the interface between phases ($F_{ss}$ function), and mainly originate
+from aforementioned bounds on physical properties such as permeability and
+elasticity. The general idea of computation of different 2-point CFs is shown in
+\cref{fig:functions}. All major details and numerous analytical cases can be
+found in seminal work of Torquato \cite{Torq_book}. To all CFs described in this
+book and applicable to digital images we shall refer as to classical correlation
+functions.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.3\textwidth]{images/corr.png}
+  \caption[]{{\small WTF?}}
+  \label{fig:functions}
+\end{figure}
+
+While evaluation of correlation functions from 2D and 3D images was a topic of
+numerous research papers, the information is highly fragmented, especially in
+terms of algorithms and their implementation in the code. Some snippets of code
+are available for some functions, but they lack general API and are usually
+implemented in proprietary interpreted languages such as Matlab. Due to a recent
+leap forward in GPU-based computations, some papers describe computations on
+this architecture, but the code is usually not provided. All in all, the
+efficient and open-source single API solution utilizing both CPU and GPU
+architectures is currently absent.
+
+The aim of this paper is to establish a general open-source solution allowing to
+compute all classical correlation functions. This solution should be well
+documented with all computational algorithms explained, it should also leverage
+on recent advances in programming high-intensity computations and utilize both
+CPU and GPU power. Our answer in the form of \code{CorrelationFunctions.jl}
+package allows to compute numerous CFs easily under any operating system. The
+manuscript describing the package is organized as follows: in \cref{scansec} we
+provide all algorithmic details for CFs computation in directions (scanning
+method). \cref{mapsec} presents all algorithmic details for computing full CFs
+maps (map method, full 2-point statistics for a given image). In \cref{verisec}
+we verify the all computations based on known analytical
+solutions. \cref{effisec} deals with computational efficiency of our code, we
+compare computational times for 2D and 3D images of different sizes for scanning
+and map methods as evaluated using either CPU or GPU. In \cref{exasec} some
+application examples are provided, including CFs evaluation for multi-phase
+materials. Finally, \cref{sumsec} summarizes all results and outlines possible
+future improvements.
 
 \section{Overview of supported functions and modules.}
 \label{oversec}
@@ -348,6 +479,7 @@ the number of elements in the input is as follows:
 Text
 
 \section{Verifying our algorithms}
+\label{verisec}
 To verify our package we use random datasets of overlapping disks (the number of
 dimensions $n = 2$) or balls ($n = 3$) with radii $R$ and centers placed in
 points generated by Poisson point process with a parameter $\lambda$. For these
@@ -507,7 +639,7 @@ of Poisson process and smaller value of $s$.
 \twocolumngrid
 
 \section{Efficiency of our algorithms}
-
+\label{effisec}
 To measure efficiecy of our algorithms we use a machine with the following
 configuration:
 \begin{itemize}
@@ -615,6 +747,14 @@ reconstruction algorithms which utilize simulated annealing.
 \end{figure*}
 \twocolumngrid
 
+\section{Examples and applications}
+\label{exasec}
+Text
+
+\section{Summary}
+\label{sumsec}
+Text
+
 \appendix
 \section{Algorithm of computation of lineal-phase function}
 \label{linpathalg}
@@ -682,4 +822,10 @@ where $n$ is the length of the array.
     \State \textbf{return} $success$ divided by $total$ element-wise.  
   \EndProcedure
 \end{algorithmic}
+
+\onecolumngrid
+\bibliography{habib}
+\bibliographystyle{plain}
+\twocolumngrid
+
 \end{document}
