@@ -206,7 +206,10 @@ function in all directions. The scan and map approaches are described in
 
 Our package takes one-, two- or three-dimensional arrays of any element type
 (usually we restrict ourselves to integer numbers of type \code{Int} or
-\code{Int8}) and treats them as homogeneous anisotropic media.
+\code{Int8}) and treats them as homogeneous anisotropic media. The package can
+understand two-phase as well as multiphase systems. Indeed, a multiphase system
+$A$ can be easily converted to a two-phase system $B$ by applying an indicator
+function $\chi(x)$ to each element of $A$ which can be written as $B = \chi(A)$.
 
 Correlation functions can be computed using closed walls (CW) and periodic
 boundary conditions. \textbf{TODO: Describe them}.
@@ -680,10 +683,12 @@ closed walls boundary conditions and computation along axial directions).
 With the \code{Map} module we follow the same procedure. Many functions in
 \code{Map} can utilize Nvidia's GPUs using the CUDA library. For example,
 two-point correlation function uses FFT transform optimized for Nvidia GPUs and
-provided in \code{CUDA.FFT} package. We provide execution times for bot CPU and
+provided in \code{CUDA.FFT} package. We provide execution times for both CPU and
 GPU. The choice between CPU or GPU version is made depending on type of input
 array. If it's \code{CuArray} rather than generic \code{AbstractArray} then CUDA
-implementation is chosen.
+implementation is chosen. Please note, that CPU versions are much slower, so we
+choose a different sides of squares ($s = 700, 1350, \dots, 7000$) and cubes
+($s = 10, 45, \dots, 350$) for evaluation of the performance.
 
 The measurements of execution time is on \cref{fig:timings}. As you can see, GPU
 versions (when available) are faster than CPU versions and limited only by
