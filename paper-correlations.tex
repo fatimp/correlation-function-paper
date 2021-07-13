@@ -191,6 +191,7 @@ functions:
 \item Surface-void function $F_{sv}$.
 \item Pore size function $P$.
 \item Chord length function $p$.
+\item Phase cross-correlation function $\rho_{ij}$
 \end{itemize}
 
 These correlation functions are calculated using two different approaches (when
@@ -249,13 +250,13 @@ Lineal-path function $L_2^{(i)}(\bm{r})$ is defined as the probability that a
 line segment with the length $|\bm{r}|$ and paralel to $\bm{r}$ lies wholly in
 the phase $i$ when randomly thrown into the input array. This function for a
 one-dimensional array is computed using the algorithm described in
-\apref{linpathalg}. A multidimensional arrays is firstly cut in slices as
-described above and \code{l2} function is calculated for each slice returning
-\code{success} and \code{total} arrays. These arrays are then accumulated as
-described in \cref{scansec} for final calculation of $L_2^{(i)}(\bm{r})$
-function.
+\apref{linpathalg}. A multidimensional arrays is firstly cut in slices and
+\code{l2} function is calculated for each slice returning \code{success} and
+\code{total} arrays. These arrays are then accumulated as described in
+\cref{scansec} for final calculation of $L_2^{(i)}(\bm{r})$ function.
 
 \subsection{Two-point function}
+\label{sec:s2}
 Two-point correlation function $S_2^{(i)}(\bm{r})$ is defined as the probability
 that both ends of a line segment with the length $|\bm{r}|$ and paralel to
 $\bm{r}$ lie in the phase $i$ when the segment is randomly thrown into the input
@@ -275,32 +276,32 @@ I^{(i)}(\bm{x}) = \left\{
 
 Two-point function is so heaviliy used internally in the package so we propose a
 bit more general definition for it:
-\begin{equation*}
+\begin{equation}
   S_2^{\chi}(\bm{r}) = \langle \chi(\bm{x}, \bm{x} + \bm{r}) \rangle
-\end{equation*}
-where $\chi(\bm{x})$ is some arbitrary indicator (or membership) function and
-$\bm{x} \in \mathbb{R}^{2n}$ where $n$ is dimensionality of the input array. The
-vector $\bm{x}$ is constructed as $(\bm{x_1}, \bm{x_2})$ where $\bm{x_1}$ and
-$\bm{x_2}$ are the coordinates of the both ends of a line segment thrown into
-the input array.
+  \label{eq:s2gen}
+\end{equation}
+where $\chi(\bm{x_1}, \bm{x_2})$ can be understood as some arbitrary indicator
+(or membership) function on $\mathbb{R}^{2n}$ where $n$ is dimensionality of the
+input array. Vectors $\bm{x_1}$ and $\bm{x_2}$ are the coordinates of the both
+ends of a line segment thrown into the input array.
 
-If $\chi(\bm{x})$ can be expressed as
-$\chi(\bm{x}) = \chi_1(\bm{x_1})\chi_2(\bm{x_2})$ (what we call
+If $\chi(\bm{x_1}, \bm{x_2})$ can be expressed as
+$\chi(\bm{x_1}, \bm{x_2}) = \chi_1(\bm{x_1})\chi_2(\bm{x_2})$ (what we call
 \code{SeparableIndicator} in our package) we use the following algorithm to
-calculate the array \code{success} for one-dimensional slice:
+calculate the array \code{success} for one-dimensional slice $a$:
 \begin{algorithmic}[1]
-  \Procedure{s2sep}{$array, \chi_1, \chi_2, periodic$}
+  \Procedure{s2sep}{$a, \chi_1, \chi_2, periodic$}
   \If{$!periodic$}
-    \State $array \gets array \odot zeros(length(array))$ \Comment{$\odot$
+    \State $a \gets a \odot zeros(length(a))$ \Comment{$\odot$
       denotes concatenation and $zeros(n)$ returns an array with $n$ zeros.}
   \EndIf
-  \State $ind1 \gets \chi_1(array)$ \Comment{apply $\chi_1$ element-wise to $array$}
-  \State $ind2 \gets \chi_2(array)$ \Comment{apply $\chi_2$ element-wise to $array$}
-  \State $ft1 \gets rfft(ind1)$ \Comment{$rfft$ is fast Fourier transform for
+  \State $a_1 \gets \chi_1(a)$ \Comment{apply $\chi_1$ element-wise to $a$}
+  \State $a_2 \gets \chi_2(a)$ \Comment{apply $\chi_2$ element-wise to $a$}
+  \State $f_1 \gets rfft(a_1)$ \Comment{$rfft$ is fast Fourier transform for
     real-valued data}
-  \State $ft2 \gets rfft(ind2)$
-  \State $s2ft \gets ft1 \cdot \overline{ft2}$ \Comment{multiply element-wise}
-  \State $success \gets irfft(s2ft)$ \Comment{$irfft$ is inverse of $rfft$}
+  \State $f_2 \gets rfft(a_2)$
+  \State $f_{S_2} \gets f_1 \cdot \overline{f_2}$ \Comment{multiply element-wise}
+  \State $success \gets irfft(f_{S_2})$ \Comment{$irfft$ is inverse of $rfft$}
   \State \textbf{return} $success$
   \EndProcedure
 \end{algorithmic}
@@ -308,17 +309,17 @@ calculate the array \code{success} for one-dimensional slice:
 If $\chi(\bm{x})$ cannot be expressed in this way (what we call
 \code{InseparableIndicator}) the algorithm is slightly different:
 \begin{algorithmic}[1]
-  \Procedure{s2insep}{$array, \chi, periodic$}
-    \State $len \gets length(array)$
+  \Procedure{s2insep}{$a, \chi, periodic$}
+    \State $len \gets length(a)$
     \If{$periodic$}
-      \State $array \gets array \odot array$
+      \State $a \gets a \odot a$
     \EndIf
     \State $success \gets zeros(len)$
     \For{$shift \gets 0,len-1$}
-      \State $array2 \gets subseq(array, shift)$
-      \Comment{$subseq$ returns subsequence of $array$ from the $shift$-th element
+      \State $a_2 \gets subseq(a, shift)$
+      \Comment{$subseq$ returns subsequence of $a$ from the $shift$-th element
         to the end.}
-      \State $array[shift] \gets sum(map(\chi, array, array2))$
+      \State $success[shift] \gets sum(map(\chi, a, a_2))$
     \EndFor
     \State \textbf{return} $success$
   \EndProcedure
@@ -337,17 +338,17 @@ paralel to $\bm{r}$ lie in the same cluster of the phase $i$ when the segment is
 randomly thrown into the input array.
 
 The algorithm for calculation of the array \code{success} for
-$C_2^{(i)}(\bm{r})$ for one-dimensional slice is straightforward:
+$C_2^{(i)}(\bm{r})$ for one-dimensional slice $a$ is straightforward:
 \begin{algorithmic}[1]
-  \Procedure{c2}{$array, phase, periodic$}
-  \State $ind \gets array = phase$ \Comment{$array$ is compared with $phase$
+  \Procedure{c2}{$a, phase, periodic$}
+  \State $a_1 \gets x = phase$ \Comment{$a$ is compared with $phase$
     element-wise}
-  \State $clusters \gets clusterize(ind)$
+  \State $c \gets clusterize(a_1)$
   \Comment{$clusterize(x)$ selects clusters from the array
     $x$. Each cluster gets its own unique integer identificator. The
     identificator $0$ is reserved for the void phase.}
   \State $\chi(x,y) \gets (x = y \ne 0)$
-  \State \textbf{return} $s2insep(clusters, \chi, periodic)$
+  \State \textbf{return} $s2insep(c, \chi, periodic)$
   \EndProcedure
 \end{algorithmic}
 
@@ -364,14 +365,13 @@ formula:
 where $I^{(i)}(\bm{x})$ is an indicator function for the phase $i$.
 
 The algorithm for calculation of the array \code{success} for
-$F_{ss}^{(i)}(\bm{r})$ for one-dimensional slice is also straightforward:
+$F_{ss}^{(i)}(\bm{r})$ for one-dimensional slice $a$is also straightforward:
 \begin{algorithmic}[1]
-  \Procedure{surfsurf}{$array, phase, periodic$}
-    \State $ind \gets array = phase$ \Comment{$array$ is compared with $phase$
-      element-wise}
-    \State $edge \gets \text{Detect edges in $ind$}$
-    \State \textbf{return} $s2sep(edge, identity, identity, periodic)$
-    \Comment{$identity(x) = x$}
+  \Procedure{surfsurf}{$a, phase, periodic$}
+    \State $a_1 \gets a = phase$
+    \State $edge \gets \text{Detect edges in $a_1$}$
+    \State \textbf{return} $s2sep(edge, E, E, periodic)$
+    \Comment{$E(x) = x$}
   \EndProcedure
 \end{algorithmic}
 
@@ -383,22 +383,21 @@ follows:
 \end{equation*}
 
 The algorithm for calculation of the array \code{success} for
-$F_{sv}^{(i)}(\bm{r})$ for one-dimensional slice is very similar to the previous
-one:
+$F_{sv}^{(i)}(\bm{r})$ for one-dimensional slice $a$ is very similar to the
+previous one:
 \begin{algorithmic}[1]
-  \Procedure{surfvoid}{$array, phase, periodic$}
-    \State $ind \gets array = phase$ \Comment{$array$ is compared with $phase$
-      element-wise}
-    \State $edge \gets \text{Detect edges in $ind$}$
-    \State $indices \gets \text{Array of all indices in $array$}$
+  \Procedure{surfvoid}{$a, phase, periodic$}
+    \State $a_1 \gets a = phase$
+    \State $edge \gets \text{Detect edges in $a_1$}$
+    \State $indices \gets \text{Array of all indices in $a$}$
     \State $\chi_1(x) \gets edge[x]$
-    \State $\chi_2(x) \gets array[x] = 0$ \Comment{$0$ is a value reserved for the
+    \State $\chi_2(x) \gets a[x] = 0$ \Comment{$0$ is a value reserved for the
       void phase}
     \State \textbf{return} $s2sep(indices, \chi_1, \chi_2, periodic)$
   \EndProcedure
 \end{algorithmic}
 
-The edges are extracted by calculating $|S(array)|$ where $S$ is the Sobel
+The edges are extracted by calculating $|S(a)|$ where $S$ is the Sobel
 operator. \textbf{TODO: Cite our first paper}. Algorithmic efficiency of these
 algorithms are $O(n\log n)$ because it's implemented using \code{s2sep} and
 filtering to extract edges is $O(n)$.
@@ -420,14 +419,15 @@ transform $\mathcal{D}(\bm{x})$ is defined as
 \right.
 \end{equation*}
 
-Our algorithm for calculating $P(r)$ for a two-phase system is the following:
+Our algorithm for calculating $P(r)$ for a two-phase system $a$ is the
+following:
 \begin{algorithmic}[1]
-  \Procedure{poresize}{$array, nbins$}
-    \State $d \gets dist(array)$ \Comment{$dist$ calculates
-      $\mathcal{D}(\bm{x})$ for each element of $array$}
+  \Procedure{poresize}{$a, nbins$}
+    \State $d \gets dist(a)$ \Comment{$dist(a)$ calculates
+      $\mathcal{D}(\bm{x})$ for each element of $a$}
     \State $f(x) \gets x \ne 0$
-    \State $positive \gets filter(d, f)$
-    \State Bin values in $positive$ to $nbins$ bins to compute a histogram $H$
+    \State $d' \gets filter(f, d)$
+    \State Bin values in $d'$ to $nbins$ bins to compute a histogram $H$
     \State \textbf{return} $H$
   \EndProcedure
 \end{algorithmic}
@@ -437,28 +437,27 @@ input array.
 \subsection{Chord length function}
 The chord length function $p^{(i)}(\bm{r})d\bm{r}$ is defined as the probability of
 finding a chord of length between $|\bm{r}|$ and $|\bm{r} + d\bm{r}|$ and
-paralled to $\bm{r}$ in phase $i$. A chords is a line segment between
+paralled to $\bm{r}$ in phase $i$. A chord is a line segment between
 intersections of an infinitely long line with the interface of the phase
 $i$. This function, again, can be calculated by cutting slices from a
 multidimensional array. The algorithm which works in $O(n)$ time where $n$ is
 the number of elements in the input is as follows:
 \begin{algorithmic}[1]
-  \Procedure{chordlength}{$array, phase, nbins$}
+  \Procedure{chordlength}{$a, phase, nbins$}
     \State $lengths \gets [\quad]$
-    \State $ind \gets array = phase$ \Comment{$array$ is compared with $phase$
-      element-wise}
-    \State $edgephase \gets maximum(array) + 1$ \Comment{``bogus'' phase for the
+    \State $a_1 \gets a = phase$
+    \State $p' \gets maximum(a) + 1$ \Comment{``bogus'' phase for the
       interface of the phase $phase$}
-    \State $edge \gets edgephase \cdot [\text{Detect edges in $ind$}]$ \Comment{We
+    \State $edge \gets p' \cdot [\text{Detect edges in $a_1$}]$ \Comment{We
       use distance transform here}
-    \State $combo = min(edge + array, edgephase)$ \Comment{Combine the original
+    \State $a_2 = min(edge + a, p')$ \Comment{Combine the original
       array and the interface for the phase $phase$}
-    \ForAll{$direction \in \{\text{Requested directions}\}$}
-      \ForAll{$slice \in \{\text{Slices parallel to $direction$}\}$}
+    \ForAll{$dir \in \{\text{Requested directions}\}$}
+      \ForAll{$s \in \{\text{Slices of $a_2$ parallel to $dir$}\}$}
         \State $len \gets 0$
         \State $startonedge \gets false$
-        \ForAll{$x \in slice$}
-          \If{$x = edgephase$}
+        \ForAll{$x \in s$}
+          \If{$x = p'$}
             \Comment{Edge found}
             \If{$len > 1 \land startonedge$}
               \State $lengths \gets (len-1):lengths$
@@ -476,6 +475,20 @@ the number of elements in the input is as follows:
     \State \textbf{return} $H$
   \EndProcedure
 \end{algorithmic}
+
+\subsection{Phase cross-corellation function}
+
+Phase cross-correlation function $\rho_{ij}(\bm{r})$ can be defined as
+\begin{equation*}
+  \rho_{ij}(\bm{r}) = \langle I^{(i)}(\bm{x}) I^{(j)}(\bm{x} + \bm{r}) \rangle
+\end{equation*}
+which can be rewritten as \cref{eq:s2gen} with $\chi(\bm{x_1}, \bm{x_2})$
+defined as follows:
+\begin{equation*}
+  \chi(\bm{x_1}, \bm{x_2}) = I^{(i)}(\bm{x}) I^{(j)}(\bm{x})
+\end{equation*}
+Now to calculate cross-correlation function we can use \code{s2sep} function
+described in \cref{sec:s2}.
 
 \section{The map approach.}
 \label{mapsec}
@@ -669,9 +682,10 @@ two-dimensional (resp. three-dimensional) array is calculated as follows:
   \right.
 \end{align*}
 Here $vn(x,y,z,o,s)$ is a value noise function. We fix a number of
-octaves $o = 5$ and a random seed $s = 34365$. The particular implementation for
-our measurements was taken from \code{ValueNoise.jl} package. An example of a
-two-dimensional image generated in this way is on \cref{fig:valuenoise}.
+octaves $o = 5$ and a random seed $s = 34365$. The particular implementation of
+value noise for our measurements was taken from \code{ValueNoise.jl} package. An
+example of a two-dimensional image generated in this way is on
+\cref{fig:valuenoise}.
 
 To measure efficiency of \code{Directional} module we generate ten arrays with
 a side of a square $s = 1000, 2000, \dots, 10000$ pixels for two-dimensional
@@ -764,17 +778,17 @@ Text
 \section{Algorithm of computation of lineal-phase function}
 \label{linpathalg}
 The algorithm below calculates $L_2^{(phase)}$ correlation function for
-one-dimensional array $array$. The result is an array of $L_2$ values for
+one-dimensional array $a$. The result is an array of $L_2$ values for
 correlation lengths from $0$ to $maxlen-1$. If $periodic$ is true (resp. false)
 then periodic (resp. CW) boundary conditions are used. The entry point of the
 algorithm is the function L2. The efficiency of the proposed algorithm is $O(n)$
 where $n$ is the length of the array.
 
 \begin{algorithmic}[1]
-  \Procedure{countruns}{$array, len, phase$}
+  \Procedure{countruns}{$a, len, phase$}
     \State $runslist \gets [\quad]$
     \State $runs \gets 0$
-    \ForAll{$x \in array$}
+    \ForAll{$x \in a$}
       \If{$x = phase$}
         \State $runs \gets runs + 1$
       \ElsIf{$runs \ne 0$}
@@ -788,34 +802,34 @@ where $n$ is the length of the array.
     \State \textbf{return} $runslist$
   \EndProcedure
   \\
-  \Procedure{updateruns}{$array, runs, n$}
+  \Procedure{updateruns}{$a, runs, n$}
     \For{$idx = 1,n$}
-      \State $array[idx] \gets array[idx] + runs$
+      \State $a[idx] \gets a[idx] + runs$
       \State $runs \gets runs - 1$
     \EndFor
   \EndProcedure
   \\
-  \Procedure{updateperiodic}{$array, first, last, n$}
+  \Procedure{updateperiodic}{$a, first, last, n$}
     \State $sum \gets first + last$
     \State $n \gets \min(n, sum)$
     \For{$idx = 1,n$}
       \State $a \gets \min(idx - 1, first, last, sum - (idx - 1))$
-      \State $array[idx] \gets array[idx] + a$
+      \State $a[idx] \gets a[idx] + a$
     \EndFor
   \EndProcedure
   \\
-  \Procedure{l2}{$array, phase, maxlen, periodic$}
+  \Procedure{l2}{$a, phase, maxlen, periodic$}
     \State $success \gets zeros(maxlen)$
     \State $total \gets zeros(maxlen)$
-    \State $len \gets length(array)$
+    \State $len \gets length(a)$
     \State $nupdates \gets \min(len, maxlen)$
-    \State $runs \gets countruns(array, maxlen, phase)$
+    \State $runs \gets countruns(a, maxlen, phase)$
     \ForAll{$run \in runs$}
       \State $updateruns(success, run, \min(run, maxlen))$
     \EndFor
     \If{$periodic$}
-      \State $first \gets first(array)$
-      \State $last \gets last(array)$
+      \State $first \gets first(a)$
+      \State $last \gets last(a)$
       \If{$first = last$}
         \State $updateperiodic(success, first, last, nupdates)$
       \EndIf
