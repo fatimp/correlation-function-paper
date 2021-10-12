@@ -15,7 +15,7 @@
 \usepackage{xcolor}
 \usepackage{algpseudocode}
 \usepackage{graphicx}
-\usepackage{subcaption}
+\usepackage{subfigure}
 
 \definecolor{light-gray}{gray}{0.95}
 \newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
@@ -146,8 +146,8 @@ functions.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.3\textwidth]{images/corr.png}
-  \caption[]{{\small WTF?}}
+  \includegraphics[width=0.9\linewidth]{images/corr.png}
+  \caption[]{WTF?}
   \label{fig:functions}
 \end{figure}
 
@@ -549,110 +549,72 @@ The results for three-dimensional case are seemingly worse than for
 two-dimensional case. This can be explained by a reduced number of realizations
 of Poisson process and smaller value of $s$.
 
-\onecolumngrid
 \begin{figure*}[t]
   \centering
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/l2-2d.png}
-    \caption[]{{\small Lineal-path correlation function}}
-    \label{fig:l2-2d}
-  \end{subfigure}
+  \subfigure[Lineal-path correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/l2-2d.png}
+    \label{fig:l2-2d}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/s2-2d.png}
-    \caption[]{{\small Two-point correlation function}}
-    \label{fig:s2-2d}
-  \end{subfigure}
+  \subfigure[Two-point correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/s2-2d.png}
+    \label{fig:s2-2d}}
   \vskip\baselineskip
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/ss-2d.png}
-    \caption[]{{\small Surface-surface correlation function}}
-    \label{fig:ss-2d}
-  \end{subfigure}
+  \subfigure[Surface-surface correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/ss-2d.png}
+    \label{fig:ss-2d}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/sv-2d.png}
-    \caption[]{{\small Surface-void correlation function}}
-    \label{fig:sv-2d}
-  \end{subfigure}
-  \caption[]{\small A comparison of calculated values of $L_2(r)$, $S_2(r)$,
+  \subfigure[Surface-void correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/sv-2d.png}
+    \label{fig:sv-2d}}
+  \caption[]{A comparison of calculated values of $L_2(r)$, $S_2(r)$,
     $F_{ss}(r)$ and $F_{sv}(r)$ with theoretical values for overlapping disks.}
   \label{fig:2d}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/l2-3d.png}
-    \caption[]{{\small Lineal-path correlation function}}
-    \label{fig:l2-3d}
-  \end{subfigure}
+  \subfigure[Lineal-path correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/l2-3d.png}
+    \label{fig:l2-3d}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/s2-3d.png}
-    \caption[]{{\small Two-point correlation function}}
-    \label{fig:s3-3d}
-  \end{subfigure}
+  \subfigure[Two-point correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/s2-3d.png}
+    \label{fig:s3-3d}}
   \vskip\baselineskip
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/ss-3d.png}
-    \caption[]{{\small Surface-surface correlation function}}
-    \label{fig:ss-3d}
-  \end{subfigure}
+  \subfigure[Surface-surface correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/ss-3d.png}
+    \label{fig:ss-3d}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/sv-3d.png}
-    \caption[]{{\small Surface-void correlation function}}
-    \label{fig:sv-3d}
-  \end{subfigure}
-  \caption[]{\small A comparison of calculated values of $L_2(r)$, $S_2(r)$,
+  \subfigure[Surface-void correlation function]{
+    \includegraphics[width=0.475\linewidth]{images/sv-3d.png}
+    \label{fig:sv-3d}}
+  \caption[]{A comparison of calculated values of $L_2(r)$, $S_2(r)$,
     $F_{ss}(r)$ and $F_{sv}(r)$ with theoretical values for overlapping balls.}
   \label{fig:3d}
 \end{figure*}
 
 \begin{figure*}[t]
   \centering
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/ps-2d.png}
-    \caption[]{{\small Pore size correlation function (2D)}}
-    \label{fig:ps-2d}
-  \end{subfigure}
+  \subfigure[Pore size correlation function (2D)]{
+    \includegraphics[width=0.475\linewidth]{images/ps-2d.png}
+    \label{fig:ps-2d}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/cl-2d.png}
-    \caption[]{{\small Chord length correlation function (2D)}}
-    \label{fig:cl-2d}
-  \end{subfigure}
+  \subfigure[Chord length correlation function (2D)]{
+    \includegraphics[width=0.475\linewidth]{images/cl-2d.png}
+    \label{fig:cl-2d}}
   \vskip\baselineskip
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/ps-3d.png}
-    \caption[]{{\small Pore size correlation function (3D)}}
-    \label{fig:ps-3d}
-  \end{subfigure}
+  \subfigure[Pore size correlation function (3D)]{
+    \includegraphics[width=0.475\linewidth]{images/ps-3d.png}
+    \label{fig:ps-3d}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/cl-3d.png}
-    \caption[]{{\small Chord length correlation function (3D)}}
-    \label{fig:cl-3d}
-  \end{subfigure}
-  \caption[]{\small A comparison of calculated values of $P(r)$ and $p(r)$
+  \subfigure[Chord length correlation function (3D)]{
+    \includegraphics[width=0.475\linewidth]{images/cl-3d.png}
+    \label{fig:cl-3d}}
+  \caption[]{A comparison of calculated values of $P(r)$ and $p(r)$
     with theoretical values for overlapping disks (\cref{fig:ps-2d} and
     \cref{fig:cl-2d}) and balls(\cref{fig:ps-3d} and \cref{fig:cl-3d}).}
   \label{fig:pscl}
 \end{figure*}
-\twocolumngrid
 
 \section{Efficiency of our algorithms}
 \label{effisec}
@@ -712,59 +674,39 @@ reconstruction algorithms which utilize simulated annealing.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.3\textwidth]{images/timing-image.png}
-  \caption[]{{\small An example of 2D image used in timing measurements}}
+  \includegraphics[width=0.9\linewidth]{images/timing-image.png}
+  \caption[]{An example of 2D image used in timing measurements.}
   \label{fig:valuenoise}
 \end{figure}
 
-\onecolumngrid
 \begin{figure*}[t]
   \centering
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/time-2d.png}
-    \caption[]{{\small Two-dimensional case, module \code{Directional}}}
-    \label{fig:timings-2d}
-  \end{subfigure}
+  \subfigure[Two-dimensional case, module \code{Directional}]{
+    \includegraphics[width=0.475\linewidth]{images/time-2d.png}
+    \label{fig:timings-2d}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/time-3d.png}
-    \caption[]{{\small Three-dimensional case, module \code{Directional}}}
-    \label{fig:timings-3d}
-  \end{subfigure}
+  \subfigure[Three-dimensional case, module \code{Directional}]{
+    \includegraphics[width=0.475\linewidth]{images/time-3d.png}
+    \label{fig:timings-3d}}
   \vskip\baselineskip
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/time-2d-map.png}
-    \caption[]{{\small Two-dimensional case, module \code{Map}, CPU}}
-    \label{fig:timings-2d-map}
-  \end{subfigure}
+  \subfigure[Two-dimensional case, module \code{Map}, CPU]{
+    \includegraphics[width=0.475\linewidth]{images/time-2d-map.png}
+    \label{fig:timings-2d-map}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/time-3d-map.png}
-    \caption[]{{\small Three-dimensional case, module \code{Map}, CPU}}
-    \label{fig:timings-3d-map}
-  \end{subfigure}
+  \subfigure[Three-dimensional case, module \code{Map}, CPU]{
+    \includegraphics[width=0.475\linewidth]{images/time-3d-map.png}
+    \label{fig:timings-3d-map}}
   \vskip\baselineskip
-    \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/time-2d-gpu.png}
-    \caption[]{{\small Two-dimensional case, module \code{Map}, GPU}}
-    \label{fig:timings-2d-gpu}
-  \end{subfigure}
+  \subfigure[Two-dimensional case, module \code{Map}, GPU]{
+    \includegraphics[width=0.475\linewidth]{images/time-2d-gpu.png}
+    \label{fig:timings-2d-gpu}}
   \hfill
-  \begin{subfigure}[b]{0.475\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/time-3d-gpu.png}
-    \caption[]{{\small Three-dimensional case, module \code{Map}, GPU}}
-    \label{fig:timings-3d-gpu}
-  \end{subfigure}
-  \caption[]{\small Execution times for different correlation functions.}
+  \subfigure[Three-dimensional case, module \code{Map}, GPU]{
+    \includegraphics[width=0.475\linewidth]{images/time-3d-gpu.png}
+    \label{fig:timings-3d-gpu}}
+  \caption[]{Execution times for different correlation functions.}
   \label{fig:timings}
 \end{figure*}
-\twocolumngrid
 
 \section{Examples and applications}
 \label{exasec}
