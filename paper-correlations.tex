@@ -212,8 +212,12 @@ understand two-phase as well as multiphase systems. Indeed, a multiphase system
 $A$ can be easily converted to a two-phase system $B$ by applying an indicator
 function $\chi(x)$ to each element of $A$ which can be written as $B = \chi(A)$.
 
-Correlation functions can be computed using closed walls (CW) and periodic
-boundary conditions. \textbf{TODO: Describe them}.
+Correlation functions can be computed using periodic and zero-padding boundary
+conditions. With periodic boundary conditions a correlation function is
+calculated as if the input array were periodically extended to infinity,
+i.e. $A_k = A_{k+N_k}$ where $N_k$ is the k-th array dimension. With
+zero-padding the input is extended with zeros, i.e. $A_k = 0$ when
+$0 < k < N_k$.
 
 \section{The scan approach.}
 \label{scansec}
@@ -722,7 +726,7 @@ Text
 The algorithm below calculates $L_2^{(phase)}$ correlation function for
 one-dimensional array $a$. The result is an array of $L_2$ values for
 correlation lengths from $0$ to $maxlen-1$. If $periodic$ is true (resp. false)
-then periodic (resp. CW) boundary conditions are used. The entry point of the
+then periodic (resp. zero padding) boundary conditions are used. The entry point of the
 algorithm is the function L2. The efficiency of the proposed algorithm is $O(n)$
 where $n$ is the length of the array.
 
