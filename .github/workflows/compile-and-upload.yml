@@ -1,6 +1,9 @@
 name: Compile and upload
 
-on: push
+on:
+  push:
+    tags:
+      - '*'
 
 jobs:
   compile_upload:
