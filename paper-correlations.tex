@@ -718,7 +718,36 @@ reconstruction algorithms which utilize simulated annealing.
 
 \section{Examples and applications}
 \label{exasec}
-Text
+After the verification of our computational approach based on analytical
+solution we can apply our algorithms to evaluate correlation functions for
+different porous media images, including real XCT and SEM images.
+
+For demonstration purposes, we computed correlation functions for images of
+sandstone found on Digital Rocks Portal \cite{DigitalRocks} all of which have
+dimensions $1000 \times 1000$. The result can be seen on \cref{fig:real-data}.
+
+\begin{figure*}[t]
+  \centering
+  \subfigure[$S_2^{(void)}$ correlation function.]{
+    \includegraphics[width=0.3\linewidth]{real-data-plots/real-s2void.png}
+    \label{fig:real-s2}}
+  \hfill
+  \subfigure[$L_2^{(void)}$ correlation function.]{
+    \includegraphics[width=0.3\linewidth]{real-data-plots/real-l2void.png}
+    \label{fig:real-l2}}
+  \subfigure[$C_2^{(void)}$ correlation function.]{
+    \includegraphics[width=0.3\linewidth]{real-data-plots/real-c2void.png}
+    \label{fig:real-c2}}
+  \vskip\baselineskip
+  \subfigure[$F_{ss}$ correlation function.]{
+    \includegraphics[width=0.3\linewidth]{real-data-plots/real-ss.png}
+    \label{fig:real-ss}}
+  \subfigure[$F_{sv}$ correlation function.]{
+    \includegraphics[width=0.3\linewidth]{real-data-plots/real-sv.png}
+    \label{fig:real-sv}}
+  \caption[]{Plots of correlation functions for images of sandstones.}
+  \label{fig:real-data}
+\end{figure*}
 
 \section{Summary}
 \label{sumsec}
