@@ -1,4 +1,4 @@
-\documentclass[reprint,amsmath,amssymb,aps,pre]{revtex4-1}
+\documentclass[reprint,amsmath,amssymb,aps,pre,nofootinbib]{revtex4-1}
 % Latex
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -292,12 +292,14 @@ ends of a line segment thrown into the input array.
 If $\chi(\bm{x_1}, \bm{x_2})$ can be expressed as
 $\chi(\bm{x_1}, \bm{x_2}) = \chi_1(\bm{x_1})\chi_2(\bm{x_2})$ (what we call
 \code{SeparableIndicator} in our package) we use the following algorithm to
-calculate the array \code{success} for one-dimensional slice $a$:
+calculate the array \code{success} for one-dimensional slice $a$: \footnote{From
+here on $\odot$ denotes concatenation and $:$ denotes consing (joining an
+element in front of a list).}
 \begin{algorithmic}[1]
   \Procedure{s2sep}{$a, \chi_1, \chi_2, periodic$}
   \If{$!periodic$}
-    \State $a \gets a \odot zeros(length(a))$ \Comment{$\odot$
-      denotes concatenation and $zeros(n)$ returns an array with $n$ zeros.}
+    \State $a \gets a \odot [0 \dots 0]$ \Comment{Pad with zeros to twice the
+      length of $a$.}
   \EndIf
   \State $a_1 \gets \chi_1(a)$ \Comment{apply $\chi_1$ element-wise to $a$}
   \State $a_2 \gets \chi_2(a)$ \Comment{apply $\chi_2$ element-wise to $a$}
@@ -320,10 +322,10 @@ If $\chi(\bm{x})$ cannot be expressed in this way (what we call
     \EndIf
     \State $success \gets zeros(len)$
     \For{$shift \gets 0,len-1$}
-      \State $a_2 \gets subseq(a, shift)$
-      \Comment{$subseq$ returns subsequence of $a$ from the $shift$-th element
-        to the end.}
-      \State $success[shift] \gets sum(map(\chi, a, a_2))$
+      \State $a_2 \gets a[shift \dots]$
+      \Comment{Take elements with index bigger than $shift$.}
+      \State $success[shift] \gets sum(\chi(a, a_2))$
+      \Comment{Apply $\chi$ element-wise and take a sum.}
     \EndFor
     \State \textbf{return} $success$
   \EndProcedure
@@ -341,16 +343,18 @@ probability that both ends of a line segment with the length $|\bm{r}|$ and
 paralel to $\bm{r}$ lie in the same cluster of the phase $i$ when the segment is
 randomly thrown into the input array.
 
+For computation of cluster function we use \code{label\_components} function
+from \code{Image.jl} package which extracts connected comonents (clusters) from the
+binary array. Each cluster gets its own unique integer identificator. The
+identificator $0$ is reserved for the void phase.
+
 The algorithm for calculation of the array \code{success} for
 $C_2^{(i)}(\bm{r})$ for one-dimensional slice $a$ is straightforward:
 \begin{algorithmic}[1]
   \Procedure{c2}{$a, phase, periodic$}
   \State $a_1 \gets x = phase$ \Comment{$a$ is compared with $phase$
     element-wise}
-  \State $c \gets clusterize(a_1)$
-  \Comment{$clusterize(x)$ selects clusters from the array
-    $x$. Each cluster gets its own unique integer identificator. The
-    identificator $0$ is reserved for the void phase.}
+  \State $c \gets label\_components(a_1)$
   \State $\chi(x,y) \gets (x = y \ne 0)$
   \State \textbf{return} $s2insep(c, \chi, periodic)$
   \EndProcedure
