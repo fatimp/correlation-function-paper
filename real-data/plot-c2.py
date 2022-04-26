@@ -22,7 +22,7 @@ for name in names:
 
 plt.xlabel('Correlation length $r$')
 plt.ylabel('$C_2^{(void)}(r)$')
-plt.yscale('log')
+#plt.yscale('log')
 plt.legend(names)
 plt.savefig('../real-data-plots/real-c2void.png')
 #plt.show()
