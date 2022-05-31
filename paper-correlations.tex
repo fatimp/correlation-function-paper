@@ -235,10 +235,10 @@ phase $i$ or that it touches an interface between phases with both of its ends
 and so on.
 
 The probability $p(\bm{r})$ can be expressed as
-\begin{equation*}
+\begin{equation}\label{eq:probability}
   p(\bm{r}) = \frac{\text{Number of successful trials $S(\bm{r})$}}
   {\text{Total number of trials $N(\bm{r})$}}
-\end{equation*}
+\end{equation}
 
 In the scan approach we fix one direction $\bm{e}$ and accumulate the values of
 $S(\bm{r})$ and $N(\bm{r})$ so that $\bm{r} \parallel \bm{e}$ into two arrays
@@ -500,7 +500,249 @@ described in \cref{sec:s2}.
 
 \section{The map approach.}
 \label{mapsec}
-Text
+
+In this approach we actively use fast Fourier transform (FFT)
+to compute some correlation function ($S_2, F_{ss}, F_{sv}, C_2$)
+in all directions.
+The FFT algorithm let us compute auto and cross-correlation fast,
+especially on GPU.
+
+Lineal-path function doesn't have FFT realization,
+therefore, we use different approach.
+
+\subsection{Lineal-path function}
+
+High-level algorithm:
+\begin{enumerate}
+  \item Chose a set of directions
+  \item for a direction in the set
+    \begin{enumerate}
+      \item align the image along the direction
+      \item scan the aligned image
+    \end{enumerate}
+\end{enumerate}
+
+Align and rotate - simple operations with linear computational complexity.
+Therefore, the complexity of the entire algorithm depends linearly 
+on the number of directions and on the size of the image.
+
+\subsection{Correlation map}
+
+\subsubsection{Auto- and cross-correlation using FFT}
+
+All subsequent functions are auto- or cross-correlations.
+Therefore, here we describe a method to compute them using FFT.
+
+\begin{algorithmic}[1]
+  \Procedure{cross\_correlation}{$a, b$}
+    \State $A \gets rfft(a)$\Comment{Real fast Fourie transform}
+    \State $B \gets rfft(b)$
+    \ForAll{$i \in CartesianIndices(A)$}
+      \State $C[i] \gets conj(A[i]) \cdot B[i]$
+    \EndFor
+    \State $c = irfft(C)$ 
+    \Comment{inverse rfft}
+    \State \textbf{return} $c$
+  \EndProcedure
+\end{algorithmic}
+
+One can use cross-correlation to compute auto-correlation,
+but special function would permorm better.
+
+\begin{algorithmic}[1]
+  \Procedure{auto\_correlation}{$a$}
+    \State $A \gets rfft(a)$
+    \ForAll{$i \in CartesianIndices(A)$}
+      \State $C[i] \gets |A[i]|^2$
+    \EndFor
+    \State $c = irfft(C)$ 
+    \State \textbf{return} $c$
+  \EndProcedure
+\end{algorithmic}
+
+CartesianIndices --- all indices of multidimensional array,
+therefore, the for loop describe elementwise operations
+and have linear computational complexity $O(n)$.
+For both functions computational complexity is $O(n\ log(n))$.
+
+It is worth noting, that the FFT approach imply
+periodic boundary conditions by design.
+
+\subsubsection{Total number of trials}
+
+$auto\_correlation$ and $cross\_correlation$ return non-negative number
+of success trials \cref{eq:probability}.
+To compute probability we need to count total number of trials.
+This value depends on boundary conditions.
+We realize two types: periodic and non-periodic (flat).
+
+\begin{algorithmic}[1]
+  \Procedure{total}{$a, periodic$}
+    \State $m, n \gets size(a)$
+    \If{periodic}
+      \ForAll{$i \in range(0, m - 1)$}
+        \ForAll{$j \in range(0, n - 1)$}
+          \State $total[i, j] \gets m \cdot n$
+        \EndFor
+      \EndFor
+    \Else
+      \ForAll{$i \in range(-m + 1, m - 1)$}
+        \ForAll{$j \in range(-n + 1, n - 1)$}
+          \State $i' \gets mod(i, 2m - 1)$
+          \State $j' \gets mod(j, 2n - 1)$
+          \State $total[i', j'] \gets |m - i| \cdot |n - j|$
+        \EndFor
+      \EndFor
+    \EndIf
+    \State \textbf{return} $total$
+  \EndProcedure
+\end{algorithmic}
+
+Described function is for 2D images,
+for 1D and 3D images realization is similar.
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n)$.
+
+\subsubsection{Two-point funciton}
+
+We realize two boundary conditions: periodic and non-periodic (flat).
+For non-periodic boundary conditions one need to double image size
+by padding new values with zeros.
+Thus, if original image is $(m \times n)$,
+then expanded image will have size $(2m - 1 \times 2n - 1)$.
+
+\begin{algorithmic}[1]
+  \Procedure{s2\_map}{$a, phase, periodic$}
+    \State $a_1 \gets a = phase$
+    \If{periodic}
+      \State $a_2 \gets a_1$
+    \Else
+      \State $a_2 \gets expand(a_1)$\Comment{double image size by padding new values with zeros}
+    \EndIf
+    
+    \State $success \gets AUTO\_CORRELATION(a_2)$
+
+    \State $total \gets TOTAL(a, periodic)$
+
+    \ForAll{$i \in CartesianIndices(success)$}
+      \State $s2[i] \gets success[i]\ /\ total[i]$
+    \EndFor
+    
+    \State \textbf{return} $s2$
+  \EndProcedure
+\end{algorithmic} 
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsubsection{Phase cross-correlation funciton}
+
+\begin{algorithmic}[1]
+  \Procedure{cc\_map}{$a, b, periodic$}
+    \If{periodic}
+      \State $a_1 \gets a$
+      \State $b_1 \gets b$
+    \Else
+      \State $a_1 \gets expand(a)$
+      \State $b_1 \gets expand(b)$
+    \EndIf
+    
+    \State $success \gets CROSS\_CORRELATION(a_1, b_1)$
+
+    \State $total \gets TOTAL(a, periodic)$
+
+    \ForAll{$i \in CartesianIndices(success)$}
+      \State $cc[i] \gets success[i]\ /\ total[i]$
+    \EndFor
+
+    \State \textbf{return} $cc$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsection{Surface-surface function}
+
+Computation of surface-surface function consists of two steps 
+\textcolor{red}{[link to surface paper]}:
+\begin{enumerate}
+  \item extracting surface $M = \nabla I(a)$
+  \item computing $F_{ss} = S_2(M)$
+\end{enumerate}
+
+For surface extraction we use `imgradient' function
+and Sobel kernel as default kernel, 
+both defined in ImageFiltering.jl package \textcolor{red}{[add link]}.
+
+\begin{algorithmic}[1]
+  \Procedure{surf\_surf}{$a, phase, periodic, kernel$}
+    \State $a_1 \gets a = phase$
+    \State $M \gets imgradient(a_1, kernel)$
+    \State $Fss = S2\_MAP(M, periodic)$
+    \State \textbf{return} $Fss$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsection{Surface-void function}
+
+
+Computation of surface-void function consists of three steps 
+\textcolor{red}{[link to surface paper]}:
+\begin{enumerate}
+  \item extracting surface $M = \nabla I(a)$
+  \item extracting void phase $V = I_v(a)$
+  \item computing $F_{sv} = cross\_correlation(M, V)$
+\end{enumerate}
+
+\begin{algorithmic}[1]
+  \Procedure{surf\_void}{$a, phase, periodic, kernel$}
+    \State $a_1 \gets a = phase$
+    \State $M \gets imgradient(a_1, kernel)$
+    \State $V \gets a = 0$
+    \State $Fsv = CC\_MAP(M, V, periodic)$
+    \State \textbf{return} $Fsv$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsection{Cluster funciton}
+
+Computation of cluster function consists of three steps
+\begin{enumerate}
+  \item label different clusters with distinct integers
+  \item compute $S_2$ map for every cluster
+  \item add up all maps
+\end{enumerate}
+
+For labeling we use `label\_components' function from
+Images.jl package \textcolor{red}{[add link]}.
+
+\begin{algorithmic}[1]
+  \Procedure{cluster\_map}{$a, phase, periodic$}
+    \State $a_1 \gets a = phase$
+    \State $labeled\_a \gets label\_components(a_1, periodic)$
+    \State $number\_of\_labels = maximum(labeled\_a)$
+    \ForAll{$label \in range(1, number\_of\_labels)$}
+      \State $b \gets labeled\_a = label$
+      \If{label = 1}
+        \State $c2 \gets S2\_MAP(b, periodic)$
+      \Else
+        \State $c2 \gets c2 + S2\_MAP(b, periodic)$
+      \EndIf
+    \EndFor
+    \State \textbf{return} $c2$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels and N is the number of clusters, then computational complexity
+of this funciton is $O(N\ n\ log(n))$.
 
 \section{Verifying our algorithms}
 \label{verisec}
