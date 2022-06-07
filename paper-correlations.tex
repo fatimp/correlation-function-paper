@@ -504,17 +504,25 @@ therefore, we use different approach.
 
 \subsection{Lineal-path function}
 
-High-level algorithm:
-\begin{enumerate}
-  \item Chose a set of directions
-  \item for a direction in the set
-    \begin{enumerate}
-      \item align the image along the direction
-      \item scan the aligned image
-    \end{enumerate}
-\end{enumerate}
+Since the method for calculating $l_2$ using the FFT is unknown,
+we use the direct approach:
+scan the image in each selected direction.
+\textcolor{red}{[czech paper]} uses this method,
+but our approach saves porosity when rotating the image.
+The top-level algorithm is described below, 
+and the details are placed in the appendix.
 
-Align and rotate - simple operations with linear computational complexity.
+\begin{algorithmic}[1]
+  \Procedure{l2\_map}{$a, periodic, directions$}
+    \ForAll{$direction \in directions$}
+      \State $rotated \gets rotate(a, direction, periodic)$
+      \State $l2[direction] \gets scan\_l2(aligned, periodic)$
+    \EndFor
+    \State \textbf{return} $l2$
+  \EndProcedure
+\end{algorithmic}
+
+Align and rotate --- simple operations with linear computational complexity.
 Therefore, the complexity of the entire algorithm depends linearly 
 on the number of directions and on the size of the image.
 
@@ -1081,6 +1089,22 @@ where $n$ is the length of the array.
       \State $updateruns(total, len, nupdates)$
     \EndIf
     \State \textbf{return} $success$ divided by $total$ element-wise.  
+  \EndProcedure
+\end{algorithmic}
+
+\section{Algorithm for image rotation}
+\label{rotating}
+
+\begin{algorithmic}[1]
+  \Procedure{rotate}{$a, direction, periodic$}
+    \ForAll{$slice \in eachslice(a)$}
+      \State $shift \gets get\_shift(slice, direction)$
+      \State $rotated\_slice \gets circshift(slice, shift)$
+      \If{$! periodic$}
+        \State $rotated\_slice[end - shift:end] \gets -1$
+      \EndIf
+    \EndFor
+  \State \textbf{return} $rotated$
   \EndProcedure
 \end{algorithmic}
 
