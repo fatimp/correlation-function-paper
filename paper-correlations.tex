@@ -1,4 +1,4 @@
-\documentclass[reprint,amsmath,amssymb,aps,pre,nofootinbib]{revtex4-1}
+\documentclass[reprint,amsmath,amssymb,aps,pre,showkeys,showpacs,nofootinbib]{revtex4-1}
 % Latex
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -23,32 +23,23 @@
 \newcommand{\apref}[1]{Appendix \ref{#1}}
 
 \begin{document}
-%*Corresponding author: Kirill M. Gerke, Tel.: +79661877715, E-mail: kg@ifz.ru,
-%Address: Schmidt Institute of Physics of the Earth of Russian Academy of
-%Sciences, Bolshaya Gruzinskaya str. 10/1, Moscow, 123242, Russia
-\author{Vasily Postnicov}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
-  Sciences, Moscow, 123242, Russia}
-\author{Alexey I. Samarin}
-\altaffiliation{Computational Mathematics and Cybernetics, Lomonosov Moscow
-  State University, Moscow, 119991, Russia}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
-  Sciences, Moscow, 123242, Russia}
-\author{Efim V. Lavrukhin}
-\altaffiliation{Computational Mathematics and Cybernetics, Lomonosov Moscow
-  State University, Moscow, 119991, Russia}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
-  Sciences, Moscow, 123242, Russia}
-\author{Marina V. Karsanina}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
-  Sciences, Moscow, 123242, Russia}
-\author{Mathieu Gravey}
-\altaffiliation{University of Lausanne, Faculty of Geosciences and Environment,
-  Institute of Earth Surface Dynamics, Lausanne, Switzerland}
-\author{Kirill M. Gerke}
-\email[E-mail:]{kg@ifz.ru}
-\affiliation{Schmidt Institute of Physics of the Earth of Russian Academy of
-  Sciences, Moscow, 123242, Russia}
+\preprint{APS/123-QED}
+
+\author{Aleksei Samarin\textsuperscript{1,2}}
+\author{Vasily Postnicov\textsuperscript{1}}
+\author{Marina Karsanina\textsuperscript{1}}
+\author{Efim Lavrukhin\textsuperscript{1,2}}
+\author{Dina Gafurova\textsuperscript{3}}
+\author{Aleksey Khlyupin\textsuperscript{1}}
+\author{Kirill Gerke\textsuperscript{1}}
+\email{kg@ifz.ru}
+
+\affiliation{\textsuperscript{1}Schmidt Institute of Physics of the Earth of
+  Russian Academy of Sciences, Moscow, 107031, Russia}
+\affiliation{\textsuperscript{2}Computational Mathematics and Cybernetics,
+  Lomonosov Moscow State University, Moscow, 119991, Russia}
+\affiliation{\textsuperscript{3}Oil and Gas Research Institute Russian Academy
+  of Sciences (OGRI RAS) 3, Gubkina st., Moscow, 119333, Russian Federation}
 
 \title{Evaluation of classical correlation functions from 2/3D images on CPU and
   GPU architectures: introducing CorrelationFunctions.jl}
@@ -62,7 +53,7 @@
 \section{Background and motivation}
 Materials are ubiquitous both in nature and in industrial human activities, and
 their physical properties are interconnected to
-structure\cite{Torq_book}\cite{Sahimi_book}\cite{Adler_book}. The information
+structure\cite{Torquato_book}\cite{Sahimi_book}\cite{Adler_recon}. The information
 about the structure usually comes in the way of 2D and 3D images obtained by
 microscopy, tomography and other related methodologies. This structural
 information can be used for numerous types of analysis, including simulations of
@@ -122,7 +113,7 @@ are not considered in this work.
 There are different types of correlation functions that in general describe some
 probabilities. The main parameter of any correlation function is the number of
 points that are utilized to evaluate such a probability. While so-called
-$n$-point probability function\cite{Torq_book} will totally describe any
+$n$-point probability function\cite{Torquato_book} will totally describe any
 structure in the limit of $n \rightarrow$ number of voxels/pixels on the image,
 computing or storing such a function is not practical. Based on information
 content, it was shown that increasing the number of point $n > 2$ only
@@ -140,7 +131,7 @@ to lie on the interface between phases ($F_{ss}$ function), and mainly originate
 from aforementioned bounds on physical properties such as permeability and
 elasticity. The general idea of computation of different 2-point CFs is shown in
 \cref{fig:functions}. All major details and numerous analytical cases can be
-found in seminal work of Torquato \cite{Torq_book}. To all CFs described in this
+found in seminal work of Torquato \cite{Torquato_book}. To all CFs described in this
 book and applicable to digital images we shall refer as to classical correlation
 functions.
 
@@ -1088,9 +1079,5 @@ where $n$ is the length of the array.
   \EndProcedure
 \end{algorithmic}
 
-\onecolumngrid
-\bibliography{habib}
-\bibliographystyle{plain}
-\twocolumngrid
-
+\bibliography{apssamp}
 \end{document}
