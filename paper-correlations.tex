@@ -17,6 +17,8 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 
+\newtheorem{definition}{Definition}
+
 \definecolor{light-gray}{gray}{0.95}
 \newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
 % When cleveref fails to do its job
@@ -139,7 +141,12 @@ functions.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.9\linewidth]{images/corr.png}
-  \caption[]{WTF?}
+  \caption[]{A schematic depiction of a binary porous media (pores are shown in
+    color) with examples of positive events for surface $F_{ss}$, $F_{sv}$ and
+    two-point probability $S_2$ correlation functions. The zoomed in area
+    represents the difference between the true ``continuous'' interface in
+    between pore and solid phases with pixelized ``digital'' interface emerging
+    due to limited resolution of digital images.}
   \label{fig:functions}
 \end{figure}
 
@@ -158,23 +165,26 @@ compute all classical correlation functions. This solution should be well
 documented with all computational algorithms explained, it should also leverage
 on recent advances in programming high-intensity computations and utilize both
 CPU and GPU power. Our answer in the form of \code{CorrelationFunctions.jl}
-package allows to compute numerous CFs easily under any operating system. The
-manuscript describing the package is organized as follows: in \cref{sec:scan} we
+package allows to compute numerous CFs easily on any operating system. The
+manuscript describing the package is organized as follows: in \cref{sec:math} we
+introduce a reader to the most common and useful correlation functions,
+\cref{sec:map} presents all algorithmic details for computing full CFs maps (map
+method, full 2-point statistics for a given image). In \cref{sec:scan} we
 provide all algorithmic details for CFs computation in directions (scanning
-method). \cref{sec:map} presents all algorithmic details for computing full CFs
-maps (map method, full 2-point statistics for a given image). In
-\cref{sec:verification} we verify the all computations based on known analytical
-solutions. \cref{sec:efficiency} deals with computational efficiency of our
-code, we compare computational times for 2D and 3D images of different sizes for
-scanning and map methods as evaluated using either CPU or GPU. In
-\cref{sec:examples} some application examples are provided, including CFs
-evaluation for multi-phase materials. Finally, \cref{sec:summary} summarizes all
-results and outlines possible future improvements.
+method). In \cref{sec:verification} we verify the all computations based on
+known analytical solutions. \cref{sec:efficiency} deals with computational
+efficiency of our code, we compare computational times for 2D and 3D images of
+different sizes for scanning and map methods as evaluated using either CPU or
+GPU. In \cref{sec:examples} some application examples are provided, including
+CFs evaluation for multi-phase materials. Finally, \cref{sec:summary} summarizes
+all results and outlines possible future improvements.
 
-\section{Overview of supported functions and modules.}
-\label{sec:overview}
-\verb+CorrelationFunctions.jl+ is capable to compute the following correlation
-functions:
+\section{Introduction to the correlation functions}
+\label{sec:math}
+In practice porous media are often described with special descriptors called
+``correlation functions''. In this section we provide a brief introduction to
+these functions which can also be found in \cite{Torquato_book}. The functions
+supported by our package are:
 \begin{itemize}
 \item Lineal-path function $L_2$.
 \item Two-point function $S_2$.
@@ -185,6 +195,111 @@ functions:
 \item Chord length function $p$.
 \item Phase cross-correlation function $\rho_{ij}$
 \end{itemize}
+
+One of basic correlation functions is a lineal path function which is defined as
+follows for homogenous media:
+\begin{definition}
+  Lineal path function $L_2^{(i)}(\mathbf{r})$ equals to probability that a
+  vector $\mathbf{r}$ lies wholly in phase $i$ when randomly thrown into the
+  sample.
+\end{definition}
+If a sample is isotropic a vector $\mathbf{r}$ can be replaced with its length
+$r$ and the definition becomes:
+\begin{definition}
+  Lineal path function (for isotropic media) $L_2^{(i)}(r)$ equals to
+  probability that a line segment of length $r$ lies wholly in phase $i$ when
+  randomly thrown into the sample.
+\end{definition}
+
+Another function of big importance is a two-point correlation function $S_2$. A
+definition for homogenous media is as follows:
+\begin{definition}
+  Two point function $S_2^{(i)}(\mathbf{r})$ equals to probability that both ends
+  of a vector $\mathbf{r}$ lie in phase $i$ when the vector is randomly thrown
+  into the sample.
+\end{definition}
+For isotopic media a vector $\mathbf{r}$ can be again reduced to a scalar value
+$r$ (i.e. a correlation function depends only on length of a vector and not on
+its direction.) Mathematically this definition can be expressed with the
+following equation:
+\begin{equation}
+  S_2^{(i)}(\mathbf{r}) = \langle I^{(i)}(\mathbf{x}) I^{(i)}(\mathbf{x} +
+  \mathbf{r}) \rangle
+  \label{eq:s2-def}
+\end{equation}
+where $I^{(i)}$ is an indicator function for a set of all points belonging to
+the phase $i$ and $\langle \cdots \rangle$ is an average over all xs.
+
+A function closely related to $S_2$ is phase cross-correlation function
+$\rho_{ij}$ which is defined with the following equation:
+\begin{equation}
+  \rho_{ij}(\mathbf{r}) = \langle I^{(i)}(\mathbf{x}) I^{(j)}(\mathbf{x} +
+  \mathbf{r}) \rangle
+  \label{eq:cross-def}
+\end{equation}
+
+The next function is a cluster function $C_2$.
+\begin{definition}
+  Cluster function $C_2^{(i)}(\mathbf{r})$ equals to probability that both
+  ends of a vector $\mathbf{r}$ lie in the same cluster when the vector is
+  randomly thrown into the sample. A cluster is a set of points of the same
+  phase $i$ where any to points can be connected by a path lying entirely in
+  that phase.
+\end{definition}
+
+The next two functions describe surface of a sample. These functions are
+surface-surface and surface-void functions. For homogenous media their
+definitions are:
+\begin{definition}
+  Surface-surface function $F_{ss}^{(i)}(\mathbf{r})$ equals to probability that
+  both ends of a vector $\mathbf{r}$ touch the interface of phase $i$ when the
+  vector is randomly thrown into the sample.
+\end{definition}
+and
+\begin{definition}
+  Surface-void function $F_{sv}^{(i)}(\mathbf{r})$ equals to probability that
+  one end of a vector $\mathbf{r}$ touches the interface of phase $i$ and the
+  other end touches the void phase when the vector is randomly thrown into the
+  sample.
+\end{definition}
+If we introduce an interface indicator function
+\begin{equation*}
+  M^{(i)}(\mathbf{r}) = | \nabla I^{(i)}(\mathbf{r}) |
+\end{equation*}
+we can define these functions mathematically as
+\begin{align}
+  F_{ss}^{(i)}(\mathbf{r}) &= \langle M^{(i)}(\mathbf{x}) M^{(i)}(\mathbf{x} +
+  \mathbf{r}) \rangle \label{eq:fss-def} \\ 
+  F_{sv}^{(i)}(\mathbf{r}) &= \langle M^{(i)}(\mathbf{x}) I^{(void)}(\mathbf{x}
+  + \mathbf{r}) \rangle \label{eq:fsv-def}
+\end{align}
+As always, there are versions of these functions applicable to scalar argument
+for isotropic media.
+
+Pore size function $P(\delta)$ is a probability density function defined as
+follows:
+\begin{definition}
+  $P(\delta)d\delta$ = Probability that a randomly chosen point in a set of points
+  belonging to the void phase lies at a distance between $\delta$ and $\delta + d\delta$
+  from the nearest point on the pore-solid interface.
+\end{definition}
+
+Finally, a chord length function $p^{(i)}(r)$ is defined as follows:
+\begin{definition}
+$p^{(i)}(r)dz$ = Probability of finding a chord of length between $r$ and $r+dr$
+in phase $i$. Chords are all of the line segments between intersections of an
+infinitely long line with the two-phase interface.
+\end{definition}
+
+
+\section{Overview of supported functions and modules.}
+\label{sec:overview}
+\verb+CorrelationFunctions.jl+ is capable to compute the following correlation
+functions:
+
+
+
+
 
 These correlation functions are calculated using two different approaches (when
 applicable). The first approach is implemented in the module \code{Directional}
@@ -210,6 +325,257 @@ calculated as if the input array were periodically extended to infinity,
 i.e. $A_k = A_{k+N_k}$ where $N_k$ is the k-th array dimension. With
 zero-padding the input is extended with zeros, i.e. $A_k = 0$ when
 $0 < k < N_k$.
+
+\section{The map approach.}
+\label{sec:map}
+In this approach we actively use fast Fourier transform (FFT)
+to compute some correlation function ($S_2, F_{ss}, F_{sv}, C_2$)
+in all directions.
+The FFT algorithm let us compute auto and cross-correlation fast,
+especially on GPU.
+
+Lineal-path function doesn't have FFT realization,
+therefore, we use different approach.
+
+\subsection{Lineal-path function}
+
+Since the method for calculating $l_2$ using the FFT is unknown,
+we use the direct approach:
+scan the image in each selected direction.
+\textcolor{red}{[czech paper]} uses this method,
+but our approach saves porosity when rotating the image.
+The top-level algorithm is described below, 
+and the details are placed in the appendix.
+
+\begin{algorithmic}[1]
+  \Procedure{l2\_map}{$a, periodic, directions$}
+    \ForAll{$direction \in directions$}
+      \State $rotated \gets rotate(a, direction, periodic)$
+      \State $l2[direction] \gets scan\_l2(aligned, periodic)$
+    \EndFor
+    \State \textbf{return} $l2$
+  \EndProcedure
+\end{algorithmic}
+
+Align and rotate --- simple operations with linear computational complexity.
+Therefore, the complexity of the entire algorithm depends linearly 
+on the number of directions and on the size of the image.
+
+\subsection{Correlation map}
+
+\subsubsection{Auto- and cross-correlation using FFT}
+
+All subsequent functions are auto- or cross-correlations.
+Therefore, here we describe a method to compute them using FFT.
+
+\begin{algorithmic}[1]
+  \Procedure{cross\_correlation}{$a, b$}
+    \State $A \gets rfft(a)$\Comment{Real fast Fourie transform}
+    \State $B \gets rfft(b)$
+    \ForAll{$i \in CartesianIndices(A)$}
+      \State $C[i] \gets conj(A[i]) \cdot B[i]$
+    \EndFor
+    \State $c = irfft(C)$ 
+    \Comment{inverse rfft}
+    \State \textbf{return} $c$
+  \EndProcedure
+\end{algorithmic}
+
+One can use cross-correlation to compute auto-correlation,
+but special function would permorm better.
+
+\begin{algorithmic}[1]
+  \Procedure{auto\_correlation}{$a$}
+    \State $A \gets rfft(a)$
+    \ForAll{$i \in CartesianIndices(A)$}
+      \State $C[i] \gets |A[i]|^2$
+    \EndFor
+    \State $c = irfft(C)$ 
+    \State \textbf{return} $c$
+  \EndProcedure
+\end{algorithmic}
+
+CartesianIndices --- all indices of multidimensional array,
+therefore, the for loop describe elementwise operations
+and have linear computational complexity $O(n)$.
+For both functions computational complexity is $O(n\ log(n))$.
+
+It is worth noting, that the FFT approach imply
+periodic boundary conditions by design.
+
+\subsubsection{Total number of trials}
+
+$auto\_correlation$ and $cross\_correlation$ return non-negative number
+of success trials \cref{eq:probability}.
+To compute probability we need to count total number of trials.
+This value depends on boundary conditions.
+We realize two types: periodic and non-periodic (flat).
+
+\begin{algorithmic}[1]
+  \Procedure{total}{$a, periodic$}
+    \State $m, n \gets size(a)$
+    \If{periodic}
+      \ForAll{$i \in range(0, m - 1)$}
+        \ForAll{$j \in range(0, n - 1)$}
+          \State $total[i, j] \gets m \cdot n$
+        \EndFor
+      \EndFor
+    \Else
+      \ForAll{$i \in range(-m + 1, m - 1)$}
+        \ForAll{$j \in range(-n + 1, n - 1)$}
+          \State $i' \gets mod(i, 2m - 1)$
+          \State $j' \gets mod(j, 2n - 1)$
+          \State $total[i', j'] \gets |m - i| \cdot |n - j|$
+        \EndFor
+      \EndFor
+    \EndIf
+    \State \textbf{return} $total$
+  \EndProcedure
+\end{algorithmic}
+
+Described function is for 2D images,
+for 1D and 3D images realization is similar.
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n)$.
+
+\subsubsection{Two-point funciton}
+
+We realize two boundary conditions: periodic and non-periodic (flat).
+For non-periodic boundary conditions one need to double image size
+by padding new values with zeros.
+Thus, if original image is $(m \times n)$,
+then expanded image will have size $(2m - 1 \times 2n - 1)$.
+
+\begin{algorithmic}[1]
+  \Procedure{s2\_map}{$a, phase, periodic$}
+    \State $a_1 \gets a = phase$
+    \If{periodic}
+      \State $a_2 \gets a_1$
+    \Else
+      \State $a_2 \gets expand(a_1)$\Comment{double image size by padding new values with zeros}
+    \EndIf
+    
+    \State $success \gets AUTO\_CORRELATION(a_2)$
+
+    \State $total \gets TOTAL(a, periodic)$
+
+    \ForAll{$i \in CartesianIndices(success)$}
+      \State $s2[i] \gets success[i]\ /\ total[i]$
+    \EndFor
+    
+    \State \textbf{return} $s2$
+  \EndProcedure
+\end{algorithmic} 
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsubsection{Phase cross-correlation funciton}
+
+\begin{algorithmic}[1]
+  \Procedure{cc\_map}{$a, b, periodic$}
+    \If{periodic}
+      \State $a_1 \gets a$
+      \State $b_1 \gets b$
+    \Else
+      \State $a_1 \gets expand(a)$
+      \State $b_1 \gets expand(b)$
+    \EndIf
+    
+    \State $success \gets CROSS\_CORRELATION(a_1, b_1)$
+
+    \State $total \gets TOTAL(a, periodic)$
+
+    \ForAll{$i \in CartesianIndices(success)$}
+      \State $cc[i] \gets success[i]\ /\ total[i]$
+    \EndFor
+
+    \State \textbf{return} $cc$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsection{Surface-surface function}
+
+Computation of surface-surface function consists of two steps 
+\textcolor{red}{[link to surface paper]}:
+\begin{enumerate}
+  \item extracting surface $M = \nabla I(a)$
+  \item computing $F_{ss} = S_2(M)$
+\end{enumerate}
+
+For surface extraction we use `imgradient' function
+and Sobel kernel as default kernel, 
+both defined in ImageFiltering.jl package \textcolor{red}{[add link]}.
+
+\begin{algorithmic}[1]
+  \Procedure{surf\_surf}{$a, phase, periodic, kernel$}
+    \State $a_1 \gets a = phase$
+    \State $M \gets imgradient(a_1, kernel)$
+    \State $Fss = S2\_MAP(M, periodic)$
+    \State \textbf{return} $Fss$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsection{Surface-void function}
+Computation of surface-void function consists of three steps 
+\textcolor{red}{[link to surface paper]}:
+\begin{enumerate}
+  \item extracting surface $M = \nabla I(a)$
+  \item extracting void phase $V = I_v(a)$
+  \item computing $F_{sv} = cross\_correlation(M, V)$
+\end{enumerate}
+
+\begin{algorithmic}[1]
+  \Procedure{surf\_void}{$a, phase, periodic, kernel$}
+    \State $a_1 \gets a = phase$
+    \State $M \gets imgradient(a_1, kernel)$
+    \State $V \gets a = 0$
+    \State $Fsv = CC\_MAP(M, V, periodic)$
+    \State \textbf{return} $Fsv$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels, then computational complexity
+of this funciton is $O(n\ log(n))$.
+
+\subsection{Cluster funciton}
+
+Computation of cluster function consists of three steps
+\begin{enumerate}
+  \item label different clusters with distinct integers
+  \item compute $S_2$ map for every cluster
+  \item add up all maps
+\end{enumerate}
+
+For labeling we use `label\_components' function from
+Images.jl package \textcolor{red}{[add link]}.
+
+\begin{algorithmic}[1]
+  \Procedure{cluster\_map}{$a, phase, periodic$}
+    \State $a_1 \gets a = phase$
+    \State $labeled\_a \gets label\_components(a_1, periodic)$
+    \State $number\_of\_labels = maximum(labeled\_a)$
+    \ForAll{$label \in range(1, number\_of\_labels)$}
+      \State $b \gets labeled\_a = label$
+      \If{label = 1}
+        \State $c2 \gets S2\_MAP(b, periodic)$
+      \Else
+        \State $c2 \gets c2 + S2\_MAP(b, periodic)$
+      \EndIf
+    \EndFor
+    \State \textbf{return} $c2$
+  \EndProcedure
+\end{algorithmic}
+
+if n is the number of pixels and N is the number of clusters, then computational complexity
+of this funciton is $O(N\ n\ log(n))$.
 
 \section{The scan approach.}
 \label{sec:scan}
@@ -489,260 +855,6 @@ defined as follows:
 \end{equation*}
 Now to calculate cross-correlation function we can use \code{s2sep} function
 described in \cref{sec:s2}.
-
-\section{The map approach.}
-\label{sec:map}
-
-In this approach we actively use fast Fourier transform (FFT)
-to compute some correlation function ($S_2, F_{ss}, F_{sv}, C_2$)
-in all directions.
-The FFT algorithm let us compute auto and cross-correlation fast,
-especially on GPU.
-
-Lineal-path function doesn't have FFT realization,
-therefore, we use different approach.
-
-\subsection{Lineal-path function}
-
-Since the method for calculating $l_2$ using the FFT is unknown,
-we use the direct approach:
-scan the image in each selected direction.
-\textcolor{red}{[czech paper]} uses this method,
-but our approach saves porosity when rotating the image.
-The top-level algorithm is described below, 
-and the details are placed in the appendix.
-
-\begin{algorithmic}[1]
-  \Procedure{l2\_map}{$a, periodic, directions$}
-    \ForAll{$direction \in directions$}
-      \State $rotated \gets rotate(a, direction, periodic)$
-      \State $l2[direction] \gets scan\_l2(aligned, periodic)$
-    \EndFor
-    \State \textbf{return} $l2$
-  \EndProcedure
-\end{algorithmic}
-
-Align and rotate --- simple operations with linear computational complexity.
-Therefore, the complexity of the entire algorithm depends linearly 
-on the number of directions and on the size of the image.
-
-\subsection{Correlation map}
-
-\subsubsection{Auto- and cross-correlation using FFT}
-
-All subsequent functions are auto- or cross-correlations.
-Therefore, here we describe a method to compute them using FFT.
-
-\begin{algorithmic}[1]
-  \Procedure{cross\_correlation}{$a, b$}
-    \State $A \gets rfft(a)$\Comment{Real fast Fourie transform}
-    \State $B \gets rfft(b)$
-    \ForAll{$i \in CartesianIndices(A)$}
-      \State $C[i] \gets conj(A[i]) \cdot B[i]$
-    \EndFor
-    \State $c = irfft(C)$ 
-    \Comment{inverse rfft}
-    \State \textbf{return} $c$
-  \EndProcedure
-\end{algorithmic}
-
-One can use cross-correlation to compute auto-correlation,
-but special function would permorm better.
-
-\begin{algorithmic}[1]
-  \Procedure{auto\_correlation}{$a$}
-    \State $A \gets rfft(a)$
-    \ForAll{$i \in CartesianIndices(A)$}
-      \State $C[i] \gets |A[i]|^2$
-    \EndFor
-    \State $c = irfft(C)$ 
-    \State \textbf{return} $c$
-  \EndProcedure
-\end{algorithmic}
-
-CartesianIndices --- all indices of multidimensional array,
-therefore, the for loop describe elementwise operations
-and have linear computational complexity $O(n)$.
-For both functions computational complexity is $O(n\ log(n))$.
-
-It is worth noting, that the FFT approach imply
-periodic boundary conditions by design.
-
-\subsubsection{Total number of trials}
-
-$auto\_correlation$ and $cross\_correlation$ return non-negative number
-of success trials \cref{eq:probability}.
-To compute probability we need to count total number of trials.
-This value depends on boundary conditions.
-We realize two types: periodic and non-periodic (flat).
-
-\begin{algorithmic}[1]
-  \Procedure{total}{$a, periodic$}
-    \State $m, n \gets size(a)$
-    \If{periodic}
-      \ForAll{$i \in range(0, m - 1)$}
-        \ForAll{$j \in range(0, n - 1)$}
-          \State $total[i, j] \gets m \cdot n$
-        \EndFor
-      \EndFor
-    \Else
-      \ForAll{$i \in range(-m + 1, m - 1)$}
-        \ForAll{$j \in range(-n + 1, n - 1)$}
-          \State $i' \gets mod(i, 2m - 1)$
-          \State $j' \gets mod(j, 2n - 1)$
-          \State $total[i', j'] \gets |m - i| \cdot |n - j|$
-        \EndFor
-      \EndFor
-    \EndIf
-    \State \textbf{return} $total$
-  \EndProcedure
-\end{algorithmic}
-
-Described function is for 2D images,
-for 1D and 3D images realization is similar.
-
-if n is the number of pixels, then computational complexity
-of this funciton is $O(n)$.
-
-\subsubsection{Two-point funciton}
-
-We realize two boundary conditions: periodic and non-periodic (flat).
-For non-periodic boundary conditions one need to double image size
-by padding new values with zeros.
-Thus, if original image is $(m \times n)$,
-then expanded image will have size $(2m - 1 \times 2n - 1)$.
-
-\begin{algorithmic}[1]
-  \Procedure{s2\_map}{$a, phase, periodic$}
-    \State $a_1 \gets a = phase$
-    \If{periodic}
-      \State $a_2 \gets a_1$
-    \Else
-      \State $a_2 \gets expand(a_1)$\Comment{double image size by padding new values with zeros}
-    \EndIf
-    
-    \State $success \gets AUTO\_CORRELATION(a_2)$
-
-    \State $total \gets TOTAL(a, periodic)$
-
-    \ForAll{$i \in CartesianIndices(success)$}
-      \State $s2[i] \gets success[i]\ /\ total[i]$
-    \EndFor
-    
-    \State \textbf{return} $s2$
-  \EndProcedure
-\end{algorithmic} 
-
-if n is the number of pixels, then computational complexity
-of this funciton is $O(n\ log(n))$.
-
-\subsubsection{Phase cross-correlation funciton}
-
-\begin{algorithmic}[1]
-  \Procedure{cc\_map}{$a, b, periodic$}
-    \If{periodic}
-      \State $a_1 \gets a$
-      \State $b_1 \gets b$
-    \Else
-      \State $a_1 \gets expand(a)$
-      \State $b_1 \gets expand(b)$
-    \EndIf
-    
-    \State $success \gets CROSS\_CORRELATION(a_1, b_1)$
-
-    \State $total \gets TOTAL(a, periodic)$
-
-    \ForAll{$i \in CartesianIndices(success)$}
-      \State $cc[i] \gets success[i]\ /\ total[i]$
-    \EndFor
-
-    \State \textbf{return} $cc$
-  \EndProcedure
-\end{algorithmic}
-
-if n is the number of pixels, then computational complexity
-of this funciton is $O(n\ log(n))$.
-
-\subsection{Surface-surface function}
-
-Computation of surface-surface function consists of two steps 
-\textcolor{red}{[link to surface paper]}:
-\begin{enumerate}
-  \item extracting surface $M = \nabla I(a)$
-  \item computing $F_{ss} = S_2(M)$
-\end{enumerate}
-
-For surface extraction we use `imgradient' function
-and Sobel kernel as default kernel, 
-both defined in ImageFiltering.jl package \textcolor{red}{[add link]}.
-
-\begin{algorithmic}[1]
-  \Procedure{surf\_surf}{$a, phase, periodic, kernel$}
-    \State $a_1 \gets a = phase$
-    \State $M \gets imgradient(a_1, kernel)$
-    \State $Fss = S2\_MAP(M, periodic)$
-    \State \textbf{return} $Fss$
-  \EndProcedure
-\end{algorithmic}
-
-if n is the number of pixels, then computational complexity
-of this funciton is $O(n\ log(n))$.
-
-\subsection{Surface-void function}
-
-
-Computation of surface-void function consists of three steps 
-\textcolor{red}{[link to surface paper]}:
-\begin{enumerate}
-  \item extracting surface $M = \nabla I(a)$
-  \item extracting void phase $V = I_v(a)$
-  \item computing $F_{sv} = cross\_correlation(M, V)$
-\end{enumerate}
-
-\begin{algorithmic}[1]
-  \Procedure{surf\_void}{$a, phase, periodic, kernel$}
-    \State $a_1 \gets a = phase$
-    \State $M \gets imgradient(a_1, kernel)$
-    \State $V \gets a = 0$
-    \State $Fsv = CC\_MAP(M, V, periodic)$
-    \State \textbf{return} $Fsv$
-  \EndProcedure
-\end{algorithmic}
-
-if n is the number of pixels, then computational complexity
-of this funciton is $O(n\ log(n))$.
-
-\subsection{Cluster funciton}
-
-Computation of cluster function consists of three steps
-\begin{enumerate}
-  \item label different clusters with distinct integers
-  \item compute $S_2$ map for every cluster
-  \item add up all maps
-\end{enumerate}
-
-For labeling we use `label\_components' function from
-Images.jl package \textcolor{red}{[add link]}.
-
-\begin{algorithmic}[1]
-  \Procedure{cluster\_map}{$a, phase, periodic$}
-    \State $a_1 \gets a = phase$
-    \State $labeled\_a \gets label\_components(a_1, periodic)$
-    \State $number\_of\_labels = maximum(labeled\_a)$
-    \ForAll{$label \in range(1, number\_of\_labels)$}
-      \State $b \gets labeled\_a = label$
-      \If{label = 1}
-        \State $c2 \gets S2\_MAP(b, periodic)$
-      \Else
-        \State $c2 \gets c2 + S2\_MAP(b, periodic)$
-      \EndIf
-    \EndFor
-    \State \textbf{return} $c2$
-  \EndProcedure
-\end{algorithmic}
-
-if n is the number of pixels and N is the number of clusters, then computational complexity
-of this funciton is $O(N\ n\ log(n))$.
 
 \section{Verifying our algorithms}
 \label{sec:verification}
