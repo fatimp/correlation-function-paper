@@ -291,43 +291,43 @@ in phase $i$. Chords are all of the line segments between intersections of an
 infinitely long line with the two-phase interface.
 \end{definition}
 
+\verb+CorrelationFunctions.jl+ is capable to compute all these
+functions. Usually there are two implementations for a function. The first
+implementation computes a correlation function in specific predefined directions
+(i.e. orientation of test vectors thrown into a sample is fixed). There are one
+predefined direction in 1D case, four directions in 2D case and thirteen
+directions in 3D case. This implementation is somewhat slow but requires much
+less memory than the second one. The second implementation computes a
+correlation function in all directions and is faster but requires much memory.
+These implementations are contained in \code{Directional} and \code{Map} modules
+of the package correspondingly.
 
-\section{Overview of supported functions and modules.}
-\label{sec:overview}
-\verb+CorrelationFunctions.jl+ is capable to compute the following correlation
-functions:
-
-
-
-
-
-These correlation functions are calculated using two different approaches (when
-applicable). The first approach is implemented in the module \code{Directional}
-and the second approach is in the module \code{Map}. The former approach (called
-the scan approach) calculates correlation functions along specified directions
-which can include axial and diagonal directions. The results of computations can
-be provided to the user separately for each requested direction or averaged
-across multiple directions. The latter approach (called the map approach)
-calculates a ``correlation map'' which holds the values of a correlation
-function in all directions. The scan and map approaches are described in
-\cref{sec:scan} and \cref{sec:map} respectively.
-
-Our package takes one-, two- or three-dimensional arrays of any element type
-(usually we restrict ourselves to integer numbers of type \code{Int} or
-\code{Int8}) and treats them as homogeneous anisotropic media. The package can
-understand two-phase as well as multiphase systems. Indeed, a multiphase system
-$A$ can be easily converted to a two-phase system $B$ by applying an indicator
-function $\chi(x)$ to each element of $A$ which can be written as $B = \chi(A)$.
-
-Correlation functions can be computed using periodic and zero-padding boundary
-conditions. With periodic boundary conditions a correlation function is
-calculated as if the input array were periodically extended to infinity,
-i.e. $A_k = A_{k+N_k}$ where $N_k$ is the k-th array dimension. With
-zero-padding the input is extended with zeros, i.e. $A_k = 0$ when
-$0 < k < N_k$.
+These functions can work in periodic and non-periodic modes. Periodic mode
+assumes that an input sample is periodically continued to the whole Euclidean
+space. Non-periodic mode assumes zero-padded input.
 
 \section{The map approach.}
 \label{sec:map}
+Definition \cref{eq:s2-def} can be rewritten as follows:
+\begin{equation}
+  S_2^{(i)}(r) = \frac{F^{-1} [|F [A^{(i)}](z)|] (r)}{N(r)} \label{eq:s2-ft}
+\end{equation}
+where $A^{(i)} \xleftarrow{I^{(i)}} A$ is a binary array obtained by element-wise
+application of interface indicator $I^{(i)}$ to an input $A$, $F$ is a discrete
+Fourier transform operator and $N(r)$ is a total number of trials (vectors
+thrown into sample).
+
+
+
+
+
+
+
+
+
+
+
+
 In this approach we actively use fast Fourier transform (FFT)
 to compute some correlation function ($S_2, F_{ss}, F_{sv}, C_2$)
 in all directions.
@@ -583,7 +583,7 @@ In this approach, the input array is cut in parallel slices (``scanned'') along
 each requested direction. Each slice is then analyzed independently as
 one-dimensional system and the result is accumulated into \code{CorrelationData}
 structure. In the following sections we provide the algorithms for computation
-of the functions given in \cref{sec:overview}.
+of the functions given in \cref{sec:math}.
 
 Generally a correlation function $F(\bm{r})$ is defined as a probability
 $p(\bm{r})$ of event $A$ which can occur when a line segment of length
