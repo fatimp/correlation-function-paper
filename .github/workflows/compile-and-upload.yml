@@ -11,17 +11,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Compile LaTeX document (stage 1)
-        uses: dante-ev/latex-action@latest
-        with:
-          root_file: paper-correlations.tex
-      - name: Run bibtex
-        uses: dante-ev/latex-action@latest
-        with:
-          root_file: paper-correlations.aux
-          compiler: bibtex
-          args:
-      - name: Compile LaTeX document (stage 2)
+      - name: Compile LaTeX document
         uses: dante-ev/latex-action@latest
         with:
           root_file: paper-correlations.tex
