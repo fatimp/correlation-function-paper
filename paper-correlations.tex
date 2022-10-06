@@ -424,67 +424,23 @@ An algorithm for $F_{ss}$ function is the following:
   \EndProcedure
 \end{algorithmic}
 
-
-
-
-\subsection{Lineal-path function}
-
-Since the method for calculating $l_2$ using the FFT is unknown,
-we use the direct approach:
-scan the image in each selected direction.
-\textcolor{red}{[czech paper]} uses this method,
-but our approach saves porosity when rotating the image.
-The top-level algorithm is described below, 
-and the details are placed in the appendix.
-
+Using \cref{eq:cross-ft} we obtain an algorithm for surface-void function:
 \begin{algorithmic}[1]
-  \Procedure{l2\_map}{$a, periodic, directions$}
-    \ForAll{$direction \in directions$}
-      \State $rotated \gets rotate(a, direction, periodic)$
-      \State $l2[direction] \gets scan\_l2(aligned, periodic)$
-    \EndFor
-    \State \textbf{return} $l2$
+  \Procedure{$F_{sv}$}{$A, phase, periodic$}
+  \If{$\neg periodic$}
+    \State $A \gets zeropad(A)$
+  \EndIf
+  \State $A^{(phase)} \gets I^{(phase)} (A)$
+  \State $A^{(void)} \gets I^{(void)} (A)$
+  \State $E_A \gets E * A^{(phase)}$
+  \State $\hat{E}_A \gets F[E_A]$
+  \State $\hat{A}^{(void)} \gets F[A^{(void)}]$
+  \State $\hat{F}_{sv} \gets \hat{E}_A \overline{\hat{A}^{(void)}} / N$
+  \State \textbf{return} $F^{-1} [\hat{F}_{sv}]$
   \EndProcedure
 \end{algorithmic}
 
-Align and rotate are simple operations with linear computational complexity.
-Therefore, the complexity of the entire algorithm depends linearly 
-on the number of directions and on the size of the image.
-
-\subsubsection{Total number of trials}
-$auto\_correlation$ and $cross\_correlation$ return non-negative number
-of success trials \cref{eq:probability}.
-To compute probability we need to count total number of trials.
-This value depends on boundary conditions.
-We realize two types: periodic and non-periodic (flat).
-
-\begin{algorithmic}[1]
-  \Procedure{total}{$a, periodic$}
-    \State $m, n \gets size(a)$
-    \If{periodic}
-      \ForAll{$i \in range(0, m - 1)$}
-        \ForAll{$j \in range(0, n - 1)$}
-          \State $total[i, j] \gets m \cdot n$
-        \EndFor
-      \EndFor
-    \Else
-      \ForAll{$i \in range(-m + 1, m - 1)$}
-        \ForAll{$j \in range(-n + 1, n - 1)$}
-          \State $i' \gets mod(i, 2m - 1)$
-          \State $j' \gets mod(j, 2n - 1)$
-          \State $total[i', j'] \gets |m - i| \cdot |n - j|$
-        \EndFor
-      \EndFor
-    \EndIf
-    \State \textbf{return} $total$
-  \EndProcedure
-\end{algorithmic}
-
-Described function is for 2D images,
-for 1D and 3D images realization is similar.
-
-if n is the number of pixels, then computational complexity
-of this funciton is $O(n)$.
+\textcolor{red}{Lineal path function?}
 
 \section{The scan approach.}
 \label{sec:scan}
