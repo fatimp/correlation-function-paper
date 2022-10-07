@@ -493,49 +493,6 @@ algorithm for calculating $P(r)$ is then:
 Algorithmic efficiency is $O(n)$ where $n$ is the number of elements in the
 input array.
 
-\subsection{Chord length function}
-The chord length function $p^{(i)}(\bm{r})d\bm{r}$ is defined as the probability of
-finding a chord of length between $|\bm{r}|$ and $|\bm{r} + d\bm{r}|$ and
-paralled to $\bm{r}$ in phase $i$. A chord is a line segment between
-intersections of an infinitely long line with the interface of the phase
-$i$. This function, again, can be calculated by cutting slices from a
-multidimensional array. The algorithm which works in $O(n)$ time where $n$ is
-the number of elements in the input is as follows:
-\begin{algorithmic}[1]
-  \Procedure{chordlength}{$a, phase, nbins$}
-    \State $lengths \gets [\quad]$
-    \State $a_1 \gets a = phase$
-    \State $p' \gets maximum(a) + 1$ \Comment{``bogus'' phase for the
-      interface of the phase $phase$}
-    \State $edge \gets p' \cdot [\text{Detect edges in $a_1$}]$ \Comment{We
-      use distance transform here}
-    \State $a_2 = min(edge + a, p')$ \Comment{Combine the original
-      array and the interface for the phase $phase$}
-    \ForAll{$dir \in \{\text{Requested directions}\}$}
-      \ForAll{$s \in \{\text{Slices of $a_2$ parallel to $dir$}\}$}
-        \State $len \gets 0$
-        \State $startonedge \gets false$
-        \ForAll{$x \in s$}
-          \If{$x = p'$}
-            \Comment{Edge found}
-            \If{$len > 1 \land startonedge$}
-              \State $lengths \gets (len-1):lengths$
-            \EndIf
-            \State $len \gets 0$
-            \State $startonedge \gets true$
-          \ElsIf{$x \ne phase$}
-            \State $startonedge \gets false$
-          \EndIf
-          \State $len \gets len + 1$
-        \EndFor
-      \EndFor
-    \EndFor
-    \State Bin elements in $lengths$ to $nbins$ bins to compute a histogram $H$
-    \State \textbf{return} $H$
-  \EndProcedure
-\end{algorithmic}
-
-
 \section{Verifying our algorithms}
 \label{sec:verification}
 To verify our package we use random datasets of overlapping disks (the number of
