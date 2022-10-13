@@ -84,7 +84,7 @@ const hists = [
 function main!()
     side = 500
     R = 10
-    λ = 4e-4
+    λ = 1e-4
 
     Random.seed!(13435)
     data = genballs(side, R, λ)

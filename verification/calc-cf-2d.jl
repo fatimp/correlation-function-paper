@@ -80,7 +80,7 @@ const hists = [
 function main!()
     side = 10000
     R = 40
-    λ = 5e-5
+    λ = 1e-4
 
     Random.seed!(13435)
     data = gendisks(side, R, λ)
