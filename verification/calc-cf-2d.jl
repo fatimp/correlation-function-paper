@@ -3,6 +3,8 @@ using Distributions
 using Statistics
 using CorrelationFunctions
 using DelimitedFiles
+using Images
+using FileIO
 import Random
 
 function gencenters(side, λ)
@@ -84,6 +86,7 @@ function main!()
 
     Random.seed!(13435)
     data = gendisks(side, R, λ)
+    save("disks.png", Gray.(data))
     println(sum(data)/length(data))
     for (name, theory, impl) in fns
         calc = data |> impl |> mean
