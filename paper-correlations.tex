@@ -649,16 +649,62 @@ functions with their theoretical values. The results are present on
   \label{fig:verification}
 \end{figure*}
 
+\section{Examples and applications}
+\label{sec:examples}
+After the verification of our computational approach based on analytical
+solution we can apply our algorithms to evaluate correlation functions for
+different porous media images, including real XCT and SEM images. A summary
+which contains information about type of the images, dimensions and resolution
+can be found in \cref{tab:samples}. XCT images of sandstones are provided by
+Digital Rocks Portal\cite{DigitalRocks}. Correlation functions of these samples
+can be seen on \cref{fig:real-data}.
 
+\begin{table*}[!pt]
+  \centering
+  \begin{ruledtabular}
+    \begin{tabular}{|c|c|c|c|}
+      Sample name & Image type & Dimensions (pixels) & Image resolution ($\mu m$) \\
+      \hline
+      Bandera Brown sandstone & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
+      Bentheimer sandstone    & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
+      Kirby sandstone         & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
+      Sandstone 1 & SEM &  $1280 \times 869$ & 0.10 \\
+      Sandstone 2 & SEM &  $1280 \times 869$ & 0.05 \\
+      Carbonate 1 & SEM &  $1024 \times 691$ & 0.06
+    \end{tabular}
+  \end{ruledtabular}
+  \caption{Summary of samples used for calculation of correlation functions.}
+  \label{tab:samples}
+\end{table*}
 
-
-
-
-
-
-
-
-
+\begin{figure*}[pt]
+  \centering
+  \subfigure[Bandera Brown sandstone]{
+    \includegraphics[width=0.3\linewidth]{real-data/BanderaBrown_2d25um_binary.png}
+    \label{fig:bandera}}
+  \hfill
+  \subfigure[Bentheimer sandstone]{
+    \includegraphics[width=0.3\linewidth]{real-data/Bentheimer_2d25um_binary.png}
+    \label{fig:bentheimer}}
+  \hfill
+  \subfigure[Kirby sandstone]{
+    \includegraphics[width=0.3\linewidth]{real-data/Kirby_2d25um_binary.png}
+    \label{fig:kirby}}
+  \vskip\baselineskip
+  \subfigure[Sandstone 1]{
+    \includegraphics[width=0.3\linewidth]{real-data/sandstone1.png}
+    \label{fig:real-sandstone-1}}
+  \hfill
+  \subfigure[Sandstone 2]{
+    \includegraphics[width=0.3\linewidth]{real-data/sandstone2.png}
+    \label{fig:real-sandstone-2}}
+  \hfill
+  \subfigure[Carbonate 1]{
+    \includegraphics[width=0.3\linewidth]{real-data/carbonate1.png}
+    \label{fig:real-carbonate-1}}
+  \caption[]{Plots of correlation functions for real samples.}
+  \label{fig:real-data}
+\end{figure*}
 
 \section{Efficiency of our algorithms}
 \label{sec:efficiency}
@@ -750,40 +796,6 @@ reconstruction algorithms which utilize simulated annealing.
     \label{fig:timings-3d-gpu}}
   \caption[]{Execution times for different correlation functions.}
   \label{fig:timings}
-\end{figure*}
-
-\section{Examples and applications}
-\label{sec:examples}
-After the verification of our computational approach based on analytical
-solution we can apply our algorithms to evaluate correlation functions for
-different porous media images, including real XCT and SEM images.
-
-For demonstration purposes, we computed correlation functions for images of
-sandstone found on Digital Rocks Portal \cite{DigitalRocks} all of which have
-dimensions $1000 \times 1000 \times 1000$. The result can be seen on
-\cref{fig:real-data}.
-
-\begin{figure*}[t]
-  \centering
-  \subfigure[$S_2^{(void)}$ correlation function.]{
-    \includegraphics[width=0.3\linewidth]{real-data-plots/real-s2void.png}
-    \label{fig:real-s2}}
-  \hfill
-  \subfigure[$L_2^{(void)}$ correlation function.]{
-    \includegraphics[width=0.3\linewidth]{real-data-plots/real-l2void.png}
-    \label{fig:real-l2}}
-  \subfigure[$C_2^{(void)}$ correlation function.]{
-    \includegraphics[width=0.3\linewidth]{real-data-plots/real-c2void.png}
-    \label{fig:real-c2}}
-  \vskip\baselineskip
-  \subfigure[$F_{ss}$ correlation function.]{
-    \includegraphics[width=0.3\linewidth]{real-data-plots/real-ss.png}
-    \label{fig:real-ss}}
-  \subfigure[$F_{sv}$ correlation function.]{
-    \includegraphics[width=0.3\linewidth]{real-data-plots/real-sv.png}
-    \label{fig:real-sv}}
-  \caption[]{Plots of correlation functions for images of sandstones.}
-  \label{fig:real-data}
 \end{figure*}
 
 \section{Summary}
