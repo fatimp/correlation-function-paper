@@ -444,7 +444,7 @@ perfectly suited for execution on GPUs.
 All algorithms described above are executed on the whole input and hence require
 a lot of memory. The scan approach deals with memory limitations at the cost of
 higher execution time. In this approach we select a list of predefined
-directions and cut all one dimensional slices from the input along those
+directions and cut all one-dimensional slices from the input along those
 directions. Then for each direction we use an appropriate algorithm in
 \cref{sec:map} to calculate a correlation function just for that slice. When all
 slices are processed we calculate the result using the formula:
@@ -461,10 +461,10 @@ for a correlation length $r$ and slice $i$.
 Another function which does not use this approach but is in the
 \code{Directional} module for historical reasons is the pore size function
 $P(r)$. Remember that pore size function is a probability distribution
-function. In practice it is better represented as a histogram of pore size
-fractions, so all bars of the histogram sum to 1. In our approach we calculate
-this histogram using distance transform. For each point $\bm{x}$ distance
-transform $\mathcal{D}(\bm{x})$ is defined as
+function. In practice it is better represented as a histogram of pore sizes
+found in the input. In our approach we calculate this histogram using distance
+transform. For each point $\bm{x}$ distance transform $\mathcal{D}(\bm{x})$ is
+defined as
 \begin{equation*}
   \mathcal{D}(\bm{x})= \left\{
   \begin{array}{ll}
@@ -478,7 +478,8 @@ algorithm for calculating $P(r)$ is then:
 \begin{algorithmic}[1]
   \Procedure{$P$}{$A, nbins$}
     \State $D \gets \mathcal{D}(A)$ \Comment{Apply $\mathcal{D}$ to each element of $A$}
-    \State $D' = \{\forall x \in D: x \ne 0\}$
+    \State $D' = \{ x \in D: x \ne 0\}$
+    \Comment Remove zeros
     \State Bin values in $D'$ to $nbins$ bins to compute a histogram $H$
     \State \textbf{return} $H$
   \EndProcedure
@@ -486,7 +487,7 @@ algorithm for calculating $P(r)$ is then:
 Algorithmic efficiency is $O(n)$ where $n$ is the number of elements in the
 input array.
 
-\section{Verifying our algorithms}
+\section{Verification of our algorithms}
 \label{sec:verification}
 Our algorithms are verified by comparing their results with known closed-form
 expressions for correlation functions for some sort of input data. One kind of
@@ -820,7 +821,7 @@ reconstruction algorithms which utilize simulated annealing.
 Text
 
 \appendix
-\section{Algorithm of computation of lineal-phase function}
+\section{Algorithm of computation of lineal-path function}
 \label{linpathalg}
 The algorithm below calculates $L_2^{(phase)}$ correlation function for
 one-dimensional array $a$. The result is an array of $L_2$ values for
