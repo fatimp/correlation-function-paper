@@ -247,34 +247,31 @@ The next function is a cluster function $C_2$.
   that phase.
 \end{definition}
 
-The next two functions describe surface of a sample. These functions are
-surface-surface and surface-void functions. For homogenous media their
-definitions are:
-\begin{definition}
-  Surface-surface function $F_{ss}^{(i)}(\bm{r})$ equals to probability that
-  both ends of a vector $\bm{r}$ touch the interface of phase $i$ when the
-  vector is randomly thrown into the sample.
-\end{definition}
-and
-\begin{definition}
-  Surface-void function $F_{sv}^{(i)}(\bm{r})$ equals to probability that
-  one end of a vector $\bm{r}$ touches the interface of phase $i$ and the
-  other end touches the void phase when the vector is randomly thrown into the
-  sample.
-\end{definition}
-If we introduce an interface indicator function
+The next two functions are called surface-surface ($F_{ss}$) and surface-void
+($F_{sv}$) functions and describe surface of a sample. We skip strict verbal
+definitions and introduce an interface indicator function instead:
 \begin{equation*}
   M^{(i)}(\bm{r}) = | \nabla I^{(i)}(\bm{r}) |
 \end{equation*}
-we can define these functions mathematically as
+Here differentiation is understood in the sense of generalized functions,
+because an ordinary differential of $I$ is either zero or undefined. For
+homogenous media definitions of these functions are:
 \begin{align}
   F_{ss}^{(i)}(\bm{r}) &= \langle M^{(i)}(\bm{x}) M^{(i)}(\bm{x} +
   \bm{r}) \rangle \label{eq:fss-def} \\
   F_{sv}^{(i)}(\bm{r}) &= \langle M^{(i)}(\bm{x}) I^{(void)}(\bm{x}
   + \bm{r}) \rangle \label{eq:fsv-def}
 \end{align}
-As always, there are versions of these functions applicable to scalar argument
-for isotropic media.
+These functions are defined for media with dimensionality of 2 and
+higher. $F_{sv}$ is a physical quantity inversely proportional to length and
+$F_{ss}$ is inversionaly proportional to surface area, therefore we can use
+$\mu m^{-1}$ to measure surface-void and $\mu m^{-2}$ to measure surface-surface
+functions. Putting it simply, surface-void function measures length (2D case) or
+surface (3D case) of a part of the interface which lies in the void phase of
+porous medium shifted by vector $\bm{r}$. Surface-surface function characterizes
+intersections of interfaces of porous medium and its shifted version. As always,
+there are versions of these functions applicable to scalar argument for
+isotropic media.
 
 Pore size function $P(\delta)$ is a probability density function defined as
 follows:
@@ -287,8 +284,8 @@ follows:
 Finally, a chord length function $p^{(i)}(r)$ is defined as follows:
 \begin{definition}
 $p^{(i)}(r)dz$ = Probability of finding a chord of length between $r$ and $r+dr$
-in phase $i$. Chords are all of the line segments between intersections of an
-infinitely long line with the two-phase interface.
+in phase $i$. Chord is a line segment which lies entirely in the same phase and
+touches the interface with its ends.
 \end{definition}
 
 \verb+CorrelationFunctions.jl+ is capable to compute all these
@@ -298,9 +295,9 @@ implementation computes a correlation function in specific predefined directions
 predefined direction in 1D case, four directions in 2D case and thirteen
 directions in 3D case. This implementation is somewhat slow but requires much
 less memory than the second one. The second implementation computes a
-correlation function in all directions and is faster but requires much memory.
-These implementations are contained in \code{Directional} and \code{Map} modules
-of the package correspondingly.
+correlation function in all possible directions and is faster but requires much
+memory. These implementations are contained in \code{Directional} and \code{Map}
+modules of the package correspondingly.
 
 These functions can work in periodic and non-periodic modes. Periodic mode
 assumes that an input sample is periodically continued to the whole Euclidean
@@ -315,22 +312,23 @@ Definition \cref{eq:s2-def} can be rewritten as follows:
 where $A^{(i)} \xleftarrow{I^{(i)}} A$ is a binary array obtained by element-wise
 application of interface indicator $I^{(i)}$ to an input $A$, $F$ is a discrete
 Fourier transform (DFT) operator and $N(r)$ is a total number of trials (vectors
-thrown into sample). If we want to calculate $S_2$ function in periodic mode we
-need only to apply \cref{eq:s2-ft} to an input to obtain the result because DFT
-implicitly continues a signal to infinity \textcolor{red}{Does this need a
-clarification?}. In non-periodic mode we need to pad an input with zeros to at
-least twice the size minus one for each dimension. In periodic mode a total
-number of trials is independent of $r$ and equals to the number of elements in
-an input array, or otherwise is calculated as described
-\textcolor{red}{Here}. The following algorithm summarizes all said above:
+thrown into the sample). If we want to calculate $S_2$ function in periodic mode
+we need only to apply \cref{eq:s2-ft} to an input to obtain the result. In
+non-periodic mode we need to pad an input with zeros to at least twice the size
+minus one for each dimension. In periodic mode a total number of trials is
+independent of $r$ and equals to the number of elements in an input array. In
+non-periodic mode $N(r)$ is calculated as described \textcolor{red}{Here}. The
+following algorithm summarizes all said above:
 \begin{algorithmic}[1]
   \Procedure{$S_2$}{$A, phase, periodic$}
   \If{$\neg periodic$}
-    \State $A \gets zeropad(A)$
+  \State $A \gets zeropad(A)$
+  \Comment Pad with at least $2\cdot size(A, i) - 1$ zeros for each dimension $i$.
   \EndIf
   \State $A^{(phase)} \gets I^{(phase)} (A)$
   \State $\hat{A}^{(phase)} \gets F[A^{(phase)}]$
   \State $\hat{S}_2 \gets |\hat{A}^{(phase)}| / N$
+  \Comment $N$ is an array with numbers of trials
   \State \textbf{return} $F^{-1} [\hat{S}_2]$
   \EndProcedure
 \end{algorithmic}
@@ -375,40 +373,34 @@ clusters. The algorithm is as follows:
   \EndProcedure
 \end{algorithmic}
 
+
+
 For surface-surface and surface-void functions we use an edge detection filter
 and then calculate either autocorrelation of the edge or cross-correlation of
 the edge and the void phase. The edge is extracted by convolving an input with a
-short signal $E$ (\cref{eq:filter-1d} for 1D case, \cref{eq:filter-2d} for 2D case or
-\cref{eq:filter-3d-1}-\cref{eq:filter-3d-3} for 3D case).
-\begin{align}
-  E^{1D} &= \frac{\sqrt{2}}{3} \left[
-    \begin{array}{ccc}
-        1 & -2 & 1
-      \end{array}
-    \right] \label{eq:filter-1d} \\
-  E^{2D} &= \frac{\sqrt{2}}{9} \left[
-    \begin{array}{ccc}
-        1 & 1 & 1 \\
-        1 & -8 & 1 \\
-        1 & 1 & 1
-      \end{array}
-    \right] \label{eq:filter-2d} \\
-  E^{3D}_{ij0} &= \frac{\sqrt{2}}{27} \left[
-    \begin{array}{ccc}
-        1 & 1 & 1 \\
-        1 & 1 & 1 \\
-        1 & 1 & 1
+short low-pass filter $H$. It has a width $7$ and all its coefficients with
+exception of the central coefficient are inversely proportional to distance
+from the center:
+\begin{equation}
+  \begin{aligned}
+    H_{ij} &= S \left\{
+    \begin{array}{cc}
+      \frac{1}{\sqrt{(i-3)^2 + (j-3)^2}} & \quad i \ne 3, j \ne 3 \\
+      C & \quad \text{otherwise}
     \end{array}
-    \right] \label{eq:filter-3d-1} \\
-  E^{3D}_{ij1} &= \frac{\sqrt{2}}{27} \left[
-    \begin{array}{ccc}
-      1 & 1 & 1 \\
-      1 & -26 & 1 \\
-      1 & 1 & 1
+    \right. \\
+    H_{ijk} &= S \left\{
+    \begin{array}{cc}
+      \frac{1}{\sqrt{(i-3)^2 + (j-3)^2 + (k-3)^3}} & \quad i \ne 3, j \ne 3, k
+      \ne 3 \\
+      C & \quad \text{otherwise}
     \end{array}
-    \right] \label{eq:filter-3d-2} \\
-  E^{3D}_{ij2} &= E^{3D}_{ij0} \label{eq:filter-3d-3}
-\end{align}
+    \right.
+  \end{aligned}
+  \label{eq:filter-7x7}
+\end{equation}
+where $C$ is such that all coefficients of $H'$ sum to zero, and $S$ equals to
+$30.45849$ in 2D and $172.96232$ in 3D case.
 
 An algorithm for $F_{ss}$ function is the following:
 \begin{algorithmic}[1]
@@ -417,9 +409,9 @@ An algorithm for $F_{ss}$ function is the following:
     \State $A \gets zeropad(A)$
   \EndIf
   \State $A^{(phase)} \gets I^{(phase)} (A)$
-  \State $E_A \gets E * A^{(phase)}$
-  \State $\hat{E}_A \gets F[E_A]$
-  \State $\hat{F}_{ss} \gets |\hat{E}_A| / N$
+  \State $A_H \gets H * A^{(phase)}$
+  \State $\hat{A}_H \gets F[A_H]$
+  \State $\hat{F}_{ss} \gets |\hat{A}_H| / N$
   \State \textbf{return} $F^{-1} [\hat{F}_{ss}]$
   \EndProcedure
 \end{algorithmic}
@@ -432,15 +424,16 @@ Using \cref{eq:cross-ft} we obtain an algorithm for surface-void function:
   \EndIf
   \State $A^{(phase)} \gets I^{(phase)} (A)$
   \State $A^{(void)} \gets I^{(void)} (A)$
-  \State $E_A \gets E * A^{(phase)}$
-  \State $\hat{E}_A \gets F[E_A]$
+  \State $A_H \gets H * A^{(phase)}$
+  \State $\hat{A}_H \gets F[A_H]$
   \State $\hat{A}^{(void)} \gets F[A^{(void)}]$
-  \State $\hat{F}_{sv} \gets \hat{E}_A \overline{\hat{A}^{(void)}} / N$
+  \State $\hat{F}_{sv} \gets \hat{A}_H \overline{\hat{A}^{(void)}} / N$
   \State \textbf{return} $F^{-1} [\hat{F}_{sv}]$
   \EndProcedure
 \end{algorithmic}
 
-\textcolor{red}{Lineal path function?}
+Our library does not have an implementation for lineal-path maps, although we
+know that such implementations exist.
 
 All these algorithms contain parallelizable operations such as fast Fourier
 transform, connected components labeling and image filtering, hence they are
