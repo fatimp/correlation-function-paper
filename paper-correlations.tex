@@ -317,8 +317,8 @@ we need only to apply \cref{eq:s2-ft} to an input to obtain the result. In
 non-periodic mode we need to pad an input with zeros to at least twice the size
 minus one for each dimension. In periodic mode a total number of trials is
 independent of $r$ and equals to the number of elements in an input array. In
-non-periodic mode $N(r)$ is calculated as described \textcolor{red}{Here}. The
-following algorithm summarizes all said above:
+non-periodic mode $N(r)$ is calculated as described in
+\cref{sec:number-of-trials}. The following algorithm summarizes all said above:
 \begin{algorithmic}[1]
   \Procedure{$S_2$}{$A, phase, periodic$}
   \If{$\neg periodic$}
@@ -821,6 +821,27 @@ reconstruction algorithms which utilize simulated annealing.
 Text
 
 \appendix
+\section{Computation of number of trials for non-periodic mode}
+\label{sec:number-of-trials}
+Here we assume that an input is padded with zeros to the length $2s_i - 1$
+across each dimension $i$ where $s_i$ is the size of the unpadded input in that
+dimension. For each dimension we calculate a sequence
+\begin{equation*}
+  N^i_j = \left\{
+  \begin{array}{cc}
+    s_i - j & \quad j \in \overline{0, s_i-1} \\
+    j - s_i + 1 & \quad j \in \overline{s_i, 2s_i-2}
+  \end{array}
+  \right.
+\end{equation*}
+
+When a number of trials is calculated as follows:
+\begin{equation*}
+  N_{i_1, i_2, \dots, i_n} = \prod_{k=1}^n N^k_{i_k}
+\end{equation*}
+Here $n$ is a number of dimensions and $i_k$ is an index into the output array
+for $k$-th dimension.
+
 \section{Algorithm of computation of lineal-path function}
 \label{linpathalg}
 The algorithm below calculates $L_2^{(phase)}$ correlation function for
