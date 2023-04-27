@@ -909,21 +909,5 @@ where $n$ is the length of the array.
   \EndProcedure
 \end{algorithmic}
 
-\section{Algorithm for image rotation}
-\label{rotating}
-
-\begin{algorithmic}[1]
-  \Procedure{rotate}{$a, direction, periodic$}
-    \ForAll{$slice \in eachslice(a)$}
-      \State $shift \gets get\_shift(slice, direction)$
-      \State $rotated\_slice \gets circshift(slice, shift)$
-      \If{$! periodic$}
-        \State $rotated\_slice[end - shift:end] \gets -1$
-      \EndIf
-    \EndFor
-  \State \textbf{return} $rotated$
-  \EndProcedure
-\end{algorithmic}
-
 \bibliography{apssamp}
 \end{document}
