@@ -577,31 +577,21 @@ phases in the input are labeled with non-negative integers.
     \State \textbf{return} $chordlist$
     \EndProcedure
 \end{algorithmic}
+This implementation also works in linear time.
 
-Another function which does not use this approach but is in the
-\code{Directional} module for historical reasons is the pore size function
+Another function built on top of distance transform is the pore size function
 $P(r)$. Remember that pore size function is a probability distribution
 function. In practice it is better represented as a histogram of pore sizes
-found in the input. In our approach we calculate this histogram using distance
-transform. For each point $\bm{x}$ distance transform $\mathcal{D}(\bm{x})$ is
-defined as
-\begin{equation*}
-  \mathcal{D}(\bm{x})= \left\{
-  \begin{array}{ll}
-    0 & \quad \bm{x} \in \text{solid phase} \\
-    \min\limits_{y \in \text{solid phase}} \rho(\bm{x},\bm{y}) & \quad \text{otherwise}
-  \end{array}
-\right.
-\end{equation*}
-Distance transform has many implementations \textcolor{red}{cite something}. Our
-algorithm for calculating $P(r)$ is then:
+found in the input. Our algorithm for calculating $P(r)$ is as follows:
 \begin{algorithmic}[1]
-  \Procedure{$P$}{$A, nbins$}
-    \State $D \gets \mathcal{D}(A)$ \Comment{Apply $\mathcal{D}$ to each element of $A$}
+  \Procedure{$P$}{$A$}
+    \State $D \gets \mathcal{D}(A)$
+    \Comment Apply $\mathcal{D}$ (\cref{eq:distance-transform}) to each element of $A$
     \State $D' = \{ x \in D: x \ne 0\}$
     \Comment Remove zeros
-    \State Bin values in $D'$ to $nbins$ bins to compute a histogram $H$
+    \State Bin values in $D'$ to histogram $H$
     \State \textbf{return} $H$
+    \Comment Alternatively just return $D'$
   \EndProcedure
 \end{algorithmic}
 Algorithmic efficiency is $O(n)$ where $n$ is the number of elements in the
