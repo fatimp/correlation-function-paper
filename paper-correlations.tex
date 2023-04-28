@@ -454,7 +454,10 @@ slices are processed we calculate the result using the formula:
 Here $F^{\bm{d}}(r)$ is a correlation function computed with respect to a
 direction $\bm{d}$, $F^{\bm{d}}_i(r)$ is a ``partial'' correlation
 function calculated for a $i$-th slice and $N_i(r)$ is a total number of trials
-for a correlation length $r$ and slice $i$.
+for a correlation length $r$ and slice $i$. Some algorithms require
+preprocessing stages before cutting the input in slices, e.g. image filtering
+for edge detection or connected components labeling is performed on the whole
+array, not on slices.
 
 An algorithm for computation of linear-path function for one-dimensional slice
 is present below. Here $a$ is a one-dimensional input array, $phase$ can be
