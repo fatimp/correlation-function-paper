@@ -456,6 +456,65 @@ direction $\bm{d}$, $F^{\bm{d}}_i(r)$ is a ``partial'' correlation
 function calculated for a $i$-th slice and $N_i(r)$ is a total number of trials
 for a correlation length $r$ and slice $i$.
 
+An algorithm for computation of linear-path function for one-dimensional slice
+is present below. Here $a$ is a one-dimensional input array, $phase$ can be
+void, solid or some other phase, and $periodic$ is a boolean value which equals
+to true if we compute $L_2$ in periodic mode and false otherwise. The efficiency
+of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
+\begin{algorithmic}[1]
+  \Procedure{l2}{$a, phase, periodic$}
+    \State $len \gets length(a)$
+    \State $result \gets zeros(len)$
+    \State $runs \gets countruns(a, phase)$
+    \ForAll{$run \in runs$}
+      \State $updateruns(result, run)$
+    \EndFor
+    \If{$periodic$}
+      \State $first \gets first(a)$
+      \State $last \gets last(a)$
+      \If{$first = last$}
+        \State $updateperiodic(result, first, last)$
+      \EndIf
+    \EndIf
+    \State \textbf{return} $success$ divided by number of trials
+    (see \cref{sec:number-of-trials})
+  \EndProcedure
+  \\
+  \Procedure{countruns}{$a, phase$}
+    \State $runslist \gets [\ ]$
+    \State $runs \gets 0$
+    \ForAll{$x \in a$}
+      \If{$x = phase$}
+        \State $runs \gets runs + 1$
+      \ElsIf{$runs \ne 0$}
+        \Comment Add $runs$ to the accumulator
+        \State $runslist \gets runs:runslist$
+        \State $runs \gets 0$
+      \EndIf
+    \EndFor
+    \If{$runs \ne 0$}
+      \State $runslist \gets runs:runslist$
+    \EndIf
+    \State \textbf{return} $runslist$
+  \EndProcedure
+  \\
+  \Procedure{updateruns}{$array, runs$}
+    \State $r \gets runs$
+    \For{$idx = 0,\ idx < runs$}
+      \State $array[idx] \gets array[idx] + r$
+      \State $r \gets r - 1$
+    \EndFor
+  \EndProcedure
+  \\
+  \Procedure{updateperiodic}{$a, first, last$}
+    \State $sum \gets first + last$
+    \For{$idx = 0,\ idx < sum$}
+      \State $up \gets \min(idx, first, last, sum - idx)$
+      \State $a[idx] \gets a[idx] + up$
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+
 \textcolor{red}{Lineal path function and chord length function}
 
 Another function which does not use this approach but is in the
@@ -850,64 +909,6 @@ correlation lengths from $0$ to $maxlen-1$. If $periodic$ is true (resp. false)
 then periodic (resp. zero padding) boundary conditions are used. The entry point of the
 algorithm is the function L2. The efficiency of the proposed algorithm is $O(n)$
 where $n$ is the length of the array.
-
-\begin{algorithmic}[1]
-  \Procedure{countruns}{$a, len, phase$}
-    \State $runslist \gets [\quad]$
-    \State $runs \gets 0$
-    \ForAll{$x \in a$}
-      \If{$x = phase$}
-        \State $runs \gets runs + 1$
-      \ElsIf{$runs \ne 0$}
-        \State $runslist \gets runs:runslist$
-        \State $runs \gets 0$
-      \EndIf
-    \EndFor
-    \If{$runs \ne 0$}
-      \State $runslist \gets runs:runslist$
-    \EndIf
-    \State \textbf{return} $runslist$
-  \EndProcedure
-  \\
-  \Procedure{updateruns}{$a, runs, n$}
-    \For{$idx = 1,n$}
-      \State $a[idx] \gets a[idx] + runs$
-      \State $runs \gets runs - 1$
-    \EndFor
-  \EndProcedure
-  \\
-  \Procedure{updateperiodic}{$a, first, last, n$}
-    \State $sum \gets first + last$
-    \State $n \gets \min(n, sum)$
-    \For{$idx = 1,n$}
-      \State $a \gets \min(idx - 1, first, last, sum - (idx - 1))$
-      \State $a[idx] \gets a[idx] + a$
-    \EndFor
-  \EndProcedure
-  \\
-  \Procedure{l2}{$a, phase, maxlen, periodic$}
-    \State $success \gets zeros(maxlen)$
-    \State $total \gets zeros(maxlen)$
-    \State $len \gets length(a)$
-    \State $nupdates \gets \min(len, maxlen)$
-    \State $runs \gets countruns(a, maxlen, phase)$
-    \ForAll{$run \in runs$}
-      \State $updateruns(success, run, \min(run, maxlen))$
-    \EndFor
-    \If{$periodic$}
-      \State $first \gets first(a)$
-      \State $last \gets last(a)$
-      \If{$first = last$}
-        \State $updateperiodic(success, first, last, nupdates)$
-      \EndIf
-      \State Increment $total[\text{from} \, 1 \, \text{to} \, nupdates]$ by
-      $len$
-    \Else
-      \State $updateruns(total, len, nupdates)$
-    \EndIf
-    \State \textbf{return} $success$ divided by $total$ element-wise.  
-  \EndProcedure
-\end{algorithmic}
 
 \bibliography{apssamp}
 \end{document}
