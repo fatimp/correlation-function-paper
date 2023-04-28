@@ -462,16 +462,16 @@ void, solid or some other phase, and $periodic$ is a boolean value which equals
 to true if we compute $L_2$ in periodic mode and false otherwise. The efficiency
 of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
 \begin{algorithmic}[1]
-  \Procedure{l2}{$a, phase, periodic$}
-    \State $len \gets length(a)$
+  \Procedure{l2}{$A, phase, periodic$}
+    \State $len \gets length(A)$
     \State $result \gets zeros(len)$
-    \State $runs \gets countruns(a, phase)$
+    \State $runs \gets countruns(A, phase)$
     \ForAll{$run \in runs$}
       \State $updateruns(result, run)$
     \EndFor
     \If{$periodic$}
-      \State $first \gets first(a)$
-      \State $last \gets last(a)$
+      \State $first \gets first(A)$
+      \State $last \gets last(A)$
       \If{$first = last$}
         \State $updateperiodic(result, first, last)$
       \EndIf
@@ -480,10 +480,10 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
     (see \cref{sec:number-of-trials})
   \EndProcedure
   \\
-  \Procedure{countruns}{$a, phase$}
+  \Procedure{countruns}{$A, phase$}
     \State $runslist \gets [\ ]$
     \State $runs \gets 0$
-    \ForAll{$x \in a$}
+    \ForAll{$x \in A$}
       \If{$x = phase$}
         \State $runs \gets runs + 1$
       \ElsIf{$runs \ne 0$}
@@ -498,24 +498,85 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
     \State \textbf{return} $runslist$
   \EndProcedure
   \\
-  \Procedure{updateruns}{$array, runs$}
+  \Procedure{updateruns}{$A, runs$}
     \State $r \gets runs$
     \For{$idx = 0,\ idx < runs$}
-      \State $array[idx] \gets array[idx] + r$
+      \State $A[idx] \gets A[idx] + r$
       \State $r \gets r - 1$
     \EndFor
   \EndProcedure
   \\
-  \Procedure{updateperiodic}{$a, first, last$}
+  \Procedure{updateperiodic}{$A, first, last$}
     \State $sum \gets first + last$
     \For{$idx = 0,\ idx < sum$}
       \State $up \gets \min(idx, first, last, sum - idx)$
-      \State $a[idx] \gets a[idx] + up$
+      \State $A[idx] \gets A[idx] + up$
     \EndFor
   \EndProcedure
 \end{algorithmic}
 
-\textcolor{red}{Lineal path function and chord length function}
+Before computation of chord length function an input array must be pre-processed
+to label an interface for the phase of interest. For this purpose we use
+distance transform function defined as follows:
+\begin{equation}
+  \mathcal{D}(\bm{x})= \left\{
+  \begin{array}{ll}
+    0 & \quad \bm{x} \in \text{solid phase} \\
+    \min\limits_{y \in \text{solid phase}} \rho(\bm{x},\bm{y}) & \quad \text{otherwise}
+  \end{array}
+\right. \label{eq:distance-transform}
+\end{equation}
+Distance transform has many implementations \textcolor{red}{cite something},
+many of them can be parralelized on GPU. Array pre-processing is performed in
+\code{cl\_preprocess} function and per-slice chord lengths accumulation is
+performed in \code{cl\_slice} function. After all cord lengths are accumulated
+they can be binned in a histogram. In the following algorithm we suppose that
+phases in the input are labeled with non-negative integers.
+\begin{algorithmic}[1]
+  \Procedure{chord\_length}{$A, phase$}
+    \State $A' \gets cl\_preprocess(A, phase)$
+    \State $chordlist \gets [\ ]$
+    \ForAll{$slice \in slices(A')$}
+      \State Append $cl\_slice(A', phase)$ to $chordlist$
+    \EndFor
+    \State \textbf{return} $chordlist$ or $histogram(chordlist)$  
+  \EndProcedure
+  \\
+  \Procedure{cl\_preprocess}{$A, phase$}
+    \State $A' \gets I^{(phase)}(A)$
+    \State $edge\_label \gets maximum(A) + 1$
+    \Comment Choose an unused label to mark elements of the interface with
+    \State $A_D = \mathcal{D}(A')$
+    \Comment Perform distance transform for all elements of $A'$
+    \State $E \gets edge\_label \cdot (A_D = 1)$
+    \Comment We consider elements of $A_D$ equal to $1$ to be part of the
+    interface and mark them so
+    \State $R \gets min(A + E, edge\_label)$
+    \Comment Add interface labels to the input
+    \State \textbf{return} $R$
+  \EndProcedure
+  \\
+  \Procedure{cl\_slice}{$A, phase$}
+    \State $chordlist \gets [\ ]$
+    \State $len \gets 0$
+    \State $maybechord \gets false$
+    \State $edge\_label \gets maximum(A)$
+    \ForAll{$x \in A$}
+      \If{$x = edge\_label$}
+        \If{$len > 1\ and\ maybechord$}
+          \State $chordlist \gets (len-1):chordlist$
+          \Comment A chord with length $len-1$ voxels is found
+        \EndIf
+        \State $len \gets 0$
+        \State $maybechord \gets true$
+      \ElsIf{$x \ne phase$}
+        \State $maybechord \gets false$
+      \EndIf
+      \State $len \gets len+1$
+    \EndFor
+    \State \textbf{return} $chordlist$
+    \EndProcedure
+\end{algorithmic}
 
 Another function which does not use this approach but is in the
 \code{Directional} module for historical reasons is the pore size function
