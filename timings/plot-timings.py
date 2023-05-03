@@ -43,11 +43,10 @@ labels = [
 #plt.figure(dpi = 300)
 
 for data, marker in zip(data3d, markers):
-    #plt.plot(data[:, 0], data[:, 1], marker = marker)
-    plt.errorbar(data[:, 0], data[:, 1], marker = marker, yerr = data[:, 2])
+    plt.errorbar(data[:, 0] ** 3, data[:, 1], marker = marker, yerr = data[:, 2])
 
 plt.legend(labels)
-plt.xlabel('Side of an image, pixels')
+plt.xlabel('Number of voxels')
 plt.ylabel('Time of execution, seconds')
 #plt.savefig('time-3d.png')
 plt.show()
