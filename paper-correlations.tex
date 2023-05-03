@@ -503,7 +503,7 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
   \\
   \Procedure{updateruns}{$A, runs$}
     \State $r \gets runs$
-    \For{$idx = 0,\ idx < runs$}
+    \For{$idx \gets 0, runs - 1$}
       \State $A[idx] \gets A[idx] + r$
       \State $r \gets r - 1$
     \EndFor
@@ -511,7 +511,7 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
   \\
   \Procedure{updateperiodic}{$A, first, last$}
     \State $sum \gets first + last$
-    \For{$idx = 0,\ idx < sum$}
+    \For{$idx \gets 0, sum - 1$}
       \State $up \gets \min(idx, first, last, sum - idx)$
       \State $A[idx] \gets A[idx] + up$
     \EndFor
@@ -519,7 +519,7 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
 \end{algorithmic}
 
 Before computation of chord length function an input array must be pre-processed
-to label an interface for the phase of interest. For this purpose we use
+to find an interface for the phase of interest. For this purpose we use
 distance transform function defined as follows:
 \begin{equation}
   \mathcal{D}(\bm{x})= \left\{
@@ -530,55 +530,39 @@ distance transform function defined as follows:
 \right. \label{eq:distance-transform}
 \end{equation}
 Distance transform has many implementations \textcolor{red}{cite something},
-many of them can be parralelized on GPU. Array pre-processing is performed in
-\code{cl\_preprocess} function and per-slice chord lengths accumulation is
-performed in \code{cl\_slice} function. After all cord lengths are accumulated
-they can be binned in a histogram. In the following algorithm we suppose that
-phases in the input are labeled with non-negative integers.
+many of them can be parralelized on GPU. In \code{chord\_length} function we
+firstly apply distance transform to an input to find the interface and then
+accumulate chord length in per-slice manner. Finally, cord lengths can be binned
+in a histogram.
 \begin{algorithmic}[1]
   \Procedure{chord\_length}{$A, phase$}
-    \State $A' \gets cl\_preprocess(A, phase)$
-    \State $chordlist \gets [\ ]$
-    \ForAll{$slice \in slices(A')$}
-      \State Append $cl\_slice(A', phase)$ to $chordlist$
-    \EndFor
-    \State \textbf{return} $chordlist$ or $histogram(chordlist)$  
-  \EndProcedure
-  \\
-  \Procedure{cl\_preprocess}{$A, phase$}
     \State $A' \gets I^{(phase)}(A)$
-    \State $edge\_label \gets maximum(A) + 1$
-    \Comment Choose an unused label to mark elements of the interface with
-    \State $A_D = \mathcal{D}(A')$
-    \Comment Perform distance transform for all elements of $A'$
-    \State $E \gets edge\_label \cdot (A_D = 1)$
-    \Comment We consider elements of $A_D$ equal to $1$ to be part of the
-    interface and mark them so
-    \State $R \gets min(A + E, edge\_label)$
-    \Comment Add interface labels to the input
-    \State \textbf{return} $R$
-  \EndProcedure
-  \\
-  \Procedure{cl\_slice}{$A, phase$}
-    \State $chordlist \gets [\ ]$
-    \State $len \gets 0$
-    \State $maybechord \gets false$
-    \State $edge\_label \gets maximum(A)$
-    \ForAll{$x \in A$}
-      \If{$x = edge\_label$}
-        \If{$len > 1\ and\ maybechord$}
-          \State $chordlist \gets (len-1):chordlist$
-          \Comment A chord with length $len-1$ voxels is found
+    \State $A_E \gets \mathcal{D}(A') = 1$
+    \Comment We consider elements for which the distance transform equals to $1$
+    to be part of the interface
+    \State $chord\_list \gets [\ ]$
+    \ForAll{$(S', S_E) \in zip(slices(A'), slices(A_E))$}
+      \Comment iterate through all one-dimensional slices in $A'$ and
+      corresponding slices in $A_E$
+      \State $l \gets 0$
+      \State $maybe\_chord \gets False$
+      \For{$idx \gets 0, length(S')-1$}
+        \If{$S_E[idx]$}
+          \Comment Interface found
+          \If{$l > 1\ and\ maybe\_chord$}
+            \Comment Chord found
+            \State $chord\_list \gets l:chord\_list$
+          \EndIf
+          \State $l \gets 0$
+          \State $maybe\_chord \gets True$
+        \ElsIf{$\neg S'[idx]$}
+          \Comment We are not in the phase of interest
+          \State $maybe\_chord \gets False$
         \EndIf
-        \State $len \gets 0$
-        \State $maybechord \gets true$
-      \ElsIf{$x \ne phase$}
-        \State $maybechord \gets false$
-      \EndIf
-      \State $len \gets len+1$
+      \EndFor
     \EndFor
-    \State \textbf{return} $chordlist$
-    \EndProcedure
+    \State \textbf{return} $chord\_list$ or $histogram(chord\_list)$
+  \EndProcedure
 \end{algorithmic}
 This implementation also works in linear time.
 
