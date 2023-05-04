@@ -4,6 +4,7 @@ import CorrelationFunctions.Map as M
 import CorrelationFunctions.Directional as D
 import Statistics as S
 import Distributions as Dist
+import CUDA
 using DelimitedFiles
 using NPZ
 
@@ -38,9 +39,6 @@ function prepare!()
     end
 end
 
-fst((x, _)) = x
-snd((_, y)) = y
-
 struct FnSpec
     fn   :: Function
     name :: String
@@ -51,6 +49,14 @@ struct ExecResult
     mean  :: Float64
     range :: Float64
 end
+
+abstract type AbstractCU end
+
+struct CPU <: AbstractCU end
+struct GPU <: AbstractCU end
+
+upload_to_cu(array, :: CPU) = array
+upload_to_cu(array, :: GPU) = CUDA.CuArray(array)
 
 s(res :: ExecResult) = res.side
 μ(res :: ExecResult) = res.mean
@@ -67,21 +73,22 @@ function estimate_range(array :: AbstractArray, prob)
     return Dist.quantile(t, 1 - α/2) * S.std(array) / sqrt(len)
 end
 
-function calculate_time!(fn :: FnSpec, dim, prefix)
+function calculate_time!(fn :: FnSpec, dim, prefix, cu :: AbstractCU = CPU())
     println(fn.name)
     data_arrays = (dim == 2) ?
         ("disks-$(side).npy" for side in 1000:1000:6000) :
         ("balls-$(side).npy" for side in 50:50:300)
+    upload(array) = upload_to_cu(array, cu)
 
     # Make sure JIT is done
-    data_arrays |> first |> npzread |> fn
+    data_arrays |> first |> npzread |> upload |> fn
 
     timings = map(data_arrays) do datapath
-        data = npzread(datapath)
+        data = datapath |> npzread |> upload
         side = size(data, 1)
         println(side)
         times = Float64[]
-        while sum(times) < 10 || length(times) < 3
+        while sum(times) < 10 || length(times) < 4
             atime = time_ns()
             fn(data)
             atime = (time_ns() - atime) / 10^9
@@ -108,9 +115,20 @@ const fn_dir = [
     FnSpec(data -> D.surfvoid(data, true; periodic = true), "surfvoid")
 ]
 
+const fn_map = [
+    FnSpec(data -> M.s2(data, true; periodic = true), "s2"),
+    FnSpec(data -> M.c2(data, true; periodic = true), "c2"),
+    FnSpec(data -> M.surf2(data, true; periodic = true), "surf2"),
+    FnSpec(data -> M.surfvoid(data, true; periodic = true), "surfvoid")
+]
+
 function do_all!()
-    foreach(fn -> calculate_time!(fn, 2, "directional"), fn_dir)
-    foreach(fn -> calculate_time!(fn, 3, "directional"), fn_dir)
+    foreach(fn -> calculate_time!(fn, 2, "dir"), fn_dir)
+    foreach(fn -> calculate_time!(fn, 3, "dir"), fn_dir)
+    foreach(fn -> calculate_time!(fn, 2, "map"), fn_map)
+    foreach(fn -> calculate_time!(fn, 3, "map"), fn_map)
+    #foreach(fn -> calculate_time!(fn, 2, "gpu", GPU()), fn_map)
+    #foreach(fn -> calculate_time!(fn, 3, "gpu", GPU()), fn_map)
 end
 
 export do_all!, prepare!
