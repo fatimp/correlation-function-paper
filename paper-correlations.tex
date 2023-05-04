@@ -378,7 +378,7 @@ clusters. The algorithm is as follows:
 For surface-surface and surface-void functions we use an edge detection filter
 and then calculate either autocorrelation of the edge or cross-correlation of
 the edge and the void phase. The edge is extracted by convolving an input with a
-short low-pass filter $H$. It has a width $7$ and all its coefficients with
+short high-pass filter $H$. It has a width $7$ and all its coefficients with
 exception of the central coefficient are inversely proportional to distance
 from the center:
 \begin{equation}
