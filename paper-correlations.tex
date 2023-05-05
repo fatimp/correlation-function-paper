@@ -824,40 +824,34 @@ can be seen on \cref{fig:real-data}.
 \section{Execution times of our algorithms}
 \label{sec:efficiency}
 To measure execution times of our algorithms we use a machine with the following
-configuration:\textcolor{red}{Must be configuration of Asus notebook}
+configuration:
 \begin{itemize}
-\item \textbf{CPU}: AMD Ryzen 5 1600X
-\item \textbf{Memory}: 32~Gb DDR4-2400 memory
+\item \textbf{CPU}: AMD Ryzen 7 5800X
+\item \textbf{Memory}: 32~Gb DDR4 memory
 \item \textbf{GPU}: Nvidia Tesla V100 with 32~Gb video memory
 \end{itemize}
 
 We generate two (resp. three) dimensional square (resp. cubic) binary arrays
 with different sides. An array used for measurements contains two solid disks
-(resp. balls) surrounded by void phase, therefore it is excected for $C_2$
-function to perform two times slower than $S_2$.
+(resp. balls) surrounded by void phase.
 
-To measure efficiency of \code{Directional} module we generate ten arrays with
-a side of a square $s = 1000, 2000, \dots, 10000$ pixels for two-dimensional
-case and ten arrays with a side of a cube $s = 50, 100, \dots, 500$ voxels for
-three-dimensional case and calculate execution time for each function. All
-functions are calculated along axial directions using periodic boundary
-conditions.
+To measure efficiency of our code we generate six arrays with a side of a square
+$s = 1000, 2000, \dots, 6000$ pixels for two-dimensional case and six arrays
+with a side of a cube $s = 50, 100, \dots, 300$ voxels for three-dimensional
+case and calculate execution time for each function. All functions are
+calculated using periodic boundary conditions. Functions which use per-slice
+directional approach are calculated along axial directions.
 
-With the \code{Map} module we follow the same procedure. Many functions in
-\code{Map} can utilize Nvidia's GPUs using the CUDA library. For example,
-two-point correlation function uses FFT transform optimized for Nvidia GPUs and
-provided in \code{CUDA.FFT} package. We provide execution times for both CPU and
-GPU. The choice between CPU or GPU version is made depending on type of input
-array. If it's \code{CuArray} rather than generic \code{AbstractArray} then CUDA
-implementation is chosen. \textcolor{red}{Please note, that CPU versions are
-  much slower, so we choose a different sides of squares
-  ($s = 700, 1350, \dots, 7000$) and cubes ($s = 10, 45, \dots, 350$)
-  for evaluation of the performance.}
+Functions which calculate full correlation maps are suitable for running on CPU
+and GPU, so we provide execution times for both. The cluster function still uses
+an algorithm for closest component labeling which works only on CPU, so there is
+a potentional for improvement for this function.
 
 The measurements of execution time is on \cref{fig:timings}. As you can see, GPU
 versions (when available) are faster than CPU versions and limited only by
-amount of video memory. Functions in \code{Directional} are the slowest among
-other implementations, but require less memory.
+amount of video memory. Functions in module \code{Directional} (which utilize
+per-slice directional approach) are the slowest among other implementations, but
+require less memory.
 
 % Replace by two disks?
 \begin{figure}[ht]
