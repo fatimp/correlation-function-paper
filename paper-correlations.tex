@@ -518,6 +518,34 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
   \EndProcedure
 \end{algorithmic}
 
+Cluster function can be calculated using the same technique as in map approach,
+but if the number of clusters is high, a naïve $O(n^2)$ algorithm may be more
+preferred than $O(MC \log M)$ algorithm. This algorithm is present below:
+\begin{algorithmic}[1]
+  \Procedure{c2}{$A, phase, periodic$}
+    \State $A' \gets I^{(phase)}(A)$
+    \State $CC \gets label\_components(A', periodic)$
+    \State $len \gets length(A)$
+    \State $result \gets zeros(len)$
+    \ForAll{$slice \in slices(CC)$}
+      \For{$i = 0,len-1$}
+        \State $end \gets len-1$
+        \If{$periodic$}
+          \State $end \gets end + i$
+        \EndIf
+        \For{$j = i, end$}
+          \If{$slice[i] = slice[j \mod len] \ne 0$}
+            \Comment $0$ is a label for background (phase not equal to $phase$).
+            \State $dst \gets |(j \mod len) - i|$
+            \State $result[dst] \gets result[dst] + 1$
+          \EndIf
+        \EndFor
+      \EndFor
+    \EndFor
+    \State \textbf{return} $result$ divided by number of trials
+  \EndProcedure
+\end{algorithmic}
+
 Before computation of chord length function an input array must be pre-processed
 to find an interface for the phase of interest. For this purpose we use
 distance transform function defined as follows:
