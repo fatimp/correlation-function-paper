@@ -775,8 +775,8 @@ solution we can apply our algorithms to evaluate correlation functions for
 different porous media images, including real XCT and SEM images. A summary
 which contains information about type of the images, dimensions and resolution
 can be found in \cref{tab:samples}. XCT images of sandstones are provided by
-Digital Rocks Portal\cite{DigitalRocks}. Correlation functions of these samples
-can be seen on \cref{fig:real-data}.
+Digital Rocks Portal\cite{DigitalRocks}. Correlation functions of XCT images
+can be seen on \cref{fig:real-xct}.
 
 \begin{table*}[!pt]
   \centering
@@ -784,9 +784,9 @@ can be seen on \cref{fig:real-data}.
     \begin{tabular}{|c|c|c|c|}
       Sample name & Image type & Dimensions (pixels) & Image resolution ($\mu m$) \\
       \hline
-      Bandera Brown sandstone & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
-      Bentheimer sandstone    & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
-      Kirby sandstone         & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
+      Castlegate sandstone & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
+      Bentheimer sandstone & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
+      Kirby sandstone      & XCT & $1000 \times 1000 \times 1000$ & 2.25 \\
       Sandstone 1 & SEM &  $1280 \times 869$ & 0.10 \\
       Sandstone 2 & SEM &  $1280 \times 869$ & 0.05 \\
       Carbonate 1 & SEM &  $1024 \times 691$ & 0.06
@@ -798,55 +798,27 @@ can be seen on \cref{fig:real-data}.
 
 \begin{figure*}[pt]
   \centering
-  \subfigure[Bandera Brown sandstone]{
-    \includegraphics[width=0.3\linewidth]{real-data/BanderaBrown_2d25um_binary.png}
-    \label{fig:bandera}}
+  \subfigure[Castlegate sandstone]{
+    \includegraphics[width=0.3\linewidth]{samples/CastleGate_2d25um_binary.png}
+    \label{fig:castlegate}}
   \hfill
   \subfigure[Bentheimer sandstone]{
-    \includegraphics[width=0.3\linewidth]{real-data/Bentheimer_2d25um_binary.png}
+    \includegraphics[width=0.3\linewidth]{samples/Bentheimer_2d25um_binary.png}
     \label{fig:bentheimer}}
   \hfill
   \subfigure[Kirby sandstone]{
-    \includegraphics[width=0.3\linewidth]{real-data/Kirby_2d25um_binary.png}
+    \includegraphics[width=0.3\linewidth]{samples/Kirby_2d25um_binary.png}
     \label{fig:kirby}}
   \vskip\baselineskip
-  \subfigure[Bandera Brown sandstone (correlation functions)]{
-    \includegraphics[width=0.3\linewidth]{real-data/BanderaBrown_2d25um_binary-plot.png}
-    \label{fig:bandera-plt}}
-  \hfill
-  \subfigure[Bentheimer sandstone (correlation functions)]{
-    \includegraphics[width=0.3\linewidth]{real-data/Bentheimer_2d25um_binary-plot.png}
-    \label{fig:bentheimer-plt}}
-  \hfill
-  \subfigure[Kirby sandstone (correlation functions)]{
-    \includegraphics[width=0.3\linewidth]{real-data/Kirby_2d25um_binary-plot.png}
-    \label{fig:kirby-plt}}
+  \includegraphics[width=0.3\linewidth]{samples/s2-xct.png}
+  \includegraphics[width=0.3\linewidth]{samples/c2-xct.png}
+  \includegraphics[width=0.3\linewidth]{samples/l2-xct.png}
   \vskip\baselineskip
-  \subfigure[Sandstone 1]{
-    \includegraphics[width=0.3\linewidth]{real-data/sandstone1.png}
-    \label{fig:real-sandstone-1}}
-  \hfill
-  \subfigure[Sandstone 2]{
-    \includegraphics[width=0.3\linewidth]{real-data/sandstone2.png}
-    \label{fig:real-sandstone-2}}
-  \hfill
-  \subfigure[Carbonate 1]{
-    \includegraphics[width=0.3\linewidth]{real-data/carbonate1.png}
-    \label{fig:real-carbonate-1-plt}}
-  \vskip\baselineskip
-  \subfigure[Sandstone 1 (correlation functions)]{
-    \includegraphics[width=0.3\linewidth]{real-data/sandstone1-plot.png}
-    \label{fig:real-sandstone-1-plt}}
-  \hfill
-  \subfigure[Sandstone 2 (correlation functions)]{
-    \includegraphics[width=0.3\linewidth]{real-data/sandstone2-plot.png}
-    \label{fig:real-sandstone-2-plt}}
-  \hfill
-  \subfigure[Carbonate 1 (correlation functions)]{
-    \includegraphics[width=0.3\linewidth]{real-data/carbonate1-plot.png}
-    \label{fig:real-carbonate-1}}
-  \caption[]{Plots of correlation functions for real samples.}
-  \label{fig:real-data}
+  \includegraphics[width=0.3\linewidth]{samples/surf2-xct.png}
+  \includegraphics[width=0.3\linewidth]{samples/surfvoid-xct.png}
+  \caption[]{Visualization of XCT images and plots of correlation functions for
+    these images.}
+  \label{fig:real-xct}
 \end{figure*}
 
 \section{Execution times of our algorithms}

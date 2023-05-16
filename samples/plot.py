@@ -14,7 +14,7 @@ def load_data(name, fn):
 
 def plot_fn(fn, ylabel, power):
     plt.figure(figsize = (10, 8), dpi = 300)
-    plt.rc('font', size = 18)
+    plt.rc('font', size = 25)
 
     for n in data:
         d = load_data(n, fn) * (1/2.25)**power
