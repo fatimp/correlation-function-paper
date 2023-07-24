@@ -584,10 +584,10 @@ distance transform function defined as follows:
   \end{array}
 \right. \label{eq:distance-transform}
 \end{equation}
-For distance transform has many implementations \textcolor{red}{cite
-  something}. In \code{chord\_length} function we firstly apply distance
-transform to an input to find the interface and then accumulate chord length in
-per-slice manner. Finally, chord lengths can be binned in a histogram.
+There are many algorithms for distance transform, including algorithms performed
+in linear time \cite{DT}.In \code{chord\_length} function we firstly apply
+distance transform to an input to find the interface and then accumulate chord
+length in per-slice manner. Finally, chord lengths can be binned in a histogram.
 \begin{algorithmic}[1]
   \Procedure{chord\_length}{$A, phase$}
     \State $A' \gets I^{(phase)}(A)$
