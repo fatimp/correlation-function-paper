@@ -471,9 +471,9 @@ if $C_{0.5} > 0.97$ then the image is suitable for our algorithms which compute
 $F_{ss}$ and $F_{sv}$.
 
 Our library does not have an implementation for lineal-path maps, although we
-know that such implementations exist \cite{Paper}. The reason is a very slow
-computation even on GPUs, plus the resulting map is not for all points on the
-image, but within a spherical volume (due to rotation of the 3D image during
+know that such implementations exist \cite{havelkafast}. The reason is a very
+slow computation even on GPUs, plus the resulting map is not for all points on
+the image, but within a spherical volume (due to rotation of the 3D image during
 lineal-path evaluation). Moreover, linear scan approach is orders of magnitude
 faster for $L_2$.
 
