@@ -454,6 +454,22 @@ Using \cref{eq:cross-ft} we obtain an algorithm for surface-void function:
   \EndProcedure
 \end{algorithmic}
 
+The interface between phases must not change very rapidly for the edge filter to
+work correctly. Therefore, the algorithms for surface functions require input
+images to be in good resolution. A criterion for goodness can be expressed with
+$C_{\alpha}$ parameter. Let $\alpha \in [0, 1]$ and $f(x)$ be your
+(band-limited) input image ($x \in \mathbb{R}^2$ or $\mathbb{R}^3$). We define
+$C_\alpha$ as follows:
+\begin{align*}
+  f_0(x) &= f(x) - \langle f(x) \rangle \\
+  C_\alpha &= \frac{\int_{-\alpha\omega}^{\alpha\omega} |\hat{f_0}(z)|^2
+    dz}{\int_{-\omega}^{\omega} |\hat{f_0}(z)|^2 dz}
+\end{align*}
+where $\hat{f_0}$ is a Fourier transform of $f_0$ and $\omega$ is a folding
+frequency which depends only on resolution of the image. Our criterion is that
+if $C_{0.5} > 0.97$ then the image is suitable for our algorithms which compute
+$F_{ss}$ and $F_{sv}$.
+
 Our library does not have an implementation for lineal-path maps, although we
 know that such implementations exist \cite{Paper}. The reason is a very slow
 computation even on GPUs, plus the resulting map is not for all points on the
