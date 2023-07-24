@@ -51,50 +51,60 @@
 \section{Background and motivation}
 \label{sec:background}
 Materials are ubiquitous both in nature and in industrial human activities, and
-their physical properties are interconnected to
-structure \cite{Torquato_book,Sahimi_book}. The information
-about the structure usually comes in the way of 2D and 3D images obtained by
-microscopy \cite{moussaoui2018,neumann2019,FIB-SEMpaper}, tomography \cite{xctmat_book} and other related methodologies.
-This structural information can be used for numerous types of analysis, including simulations of
-different processes within studied materials or evaluation of their properties
-based on 3D structural data \cite{youssef2005,Miao2017,FDMSS}. Unlike computational modelling techniques
-a whole class of approximate methods exists including (rigorous) bounds that
-allows very fast estimations of physical properties \cite{eshelby1957,berryman1986use,rozanski2023} albeit the bounds themselves
-are too wide to be applicable in the majority of practical problems. Nonetheless, it
-is noteworthy that many of such bounds are originally based on structural descriptors in
-the form of correlation functions (CFs).
+their physical properties are interconnected to structure
+\cite{Torquato_book,Sahimi_book}. The information about the structure usually
+comes in the way of 2D and 3D images obtained by microscopy
+\cite{moussaoui2018,neumann2019,FIB-SEMpaper}, tomography \cite{xctmat_book} and
+other related methodologies.  This structural information can be used for
+numerous types of analysis, including simulations of different processes within
+studied materials or evaluation of their properties based on 3D structural data
+\cite{youssef2005,Miao2017,FDMSS}. Unlike computational modelling techniques a
+whole class of approximate methods exists including (rigorous) bounds that
+allows very fast estimations of physical properties
+\cite{eshelby1957,berryman1986use,rozanski2023} albeit the bounds themselves are
+too wide to be applicable in the majority of practical problems. Nonetheless, it
+is noteworthy that many of such bounds are originally based on structural
+descriptors in the form of correlation functions (CFs).
 
 Two ways exist to obtain correlation functions for a given structure at hand:
-measure them either experimentally with the help of scattering intensity \cite{debye1957scattering,li2018direct} or
-from digital images \cite{berryman1985measurement,ma2018SS}. None is perfect, as the first approach suffers from the
-limitation of CFs that can be obtained this way, while the second one provides
-information with limited resolution or/and resolution to field-of-view ratio \cite{gerke2015universal}. In
-addition to the resolution conundrum, the most useful imaging methods such as
-X-ray computed tomography (XCT) and scanning electron microscopy (SEM) provide
-gray-scale images (e.g., X-ray attenuation or electron back-scattering
-distributions) due to their underlying physical principles and require labeling
-of constituent phases (or segmentation) before computation of
-CFs \cite{samarin2023robust}. If properly segmented \cite{NNseg}, high-resolution digital images do provide a
-possibility to compute any correlation function and, thus, possibility to
-address numerous fundamental and practical research problems.
+measure them either experimentally with the help of scattering intensity
+\cite{debye1957scattering,li2018direct} or from digital images
+\cite{berryman1985measurement,ma2018SS}. None is perfect, as the first approach
+suffers from the limitation of CFs that can be obtained this way, while the
+second one provides information with limited resolution or/and resolution to
+field-of-view ratio \cite{gerke2015universal}. In addition to the resolution
+conundrum, the most useful imaging methods such as X-ray computed tomography
+(XCT) and scanning electron microscopy (SEM) provide gray-scale images (e.g.,
+X-ray attenuation or electron back-scattering distributions) due to their
+underlying physical principles and require labeling of constituent phases (or
+segmentation) before computation of CFs \cite{samarin2023robust}. If properly
+segmented \cite{NNseg}, high-resolution digital images do provide a possibility
+to compute any correlation function and, thus, possibility to address numerous
+fundamental and practical research problems.
 
 Correlation functions as invaluable universal descriptors of structure are
-utilized in a multitude of scientific disciplines: material sciences \cite{hasanabadi20163d,Havelka,feng2018reconstruction,chen2022quantifying}, rock
-physics \cite{ledesma2018effect}, soil physics and hydrology \cite{PLoS_ONE,KarsaninaEJSS}, cosmology and food engineering \cite{TakadaJain,Derossi2019}, biology \cite{veatch2012correlation} and
-many others. Computed from 2D and 3D images, CFs can be applied to:
+utilized in a multitude of scientific disciplines: material sciences
+\cite{hasanabadi20163d,Havelka,feng2018reconstruction,chen2022quantifying}, rock
+physics \cite{ledesma2018effect}, soil physics and hydrology
+\cite{PLoS_ONE,KarsaninaEJSS}, cosmology and food engineering
+\cite{TakadaJain,Derossi2019}, biology \cite{veatch2012correlation} and many
+others. Computed from 2D and 3D images, CFs can be applied to:
 \begin{enumerate}
   \item to characterize the morphology and representativeness via correlation
     lengths \cite{vcapek2009stochastic,thovert2011grain,tensorPRE};
   \item to perform stochastic reconstructions from experimentally measured CFs
     or 2D to 3D reconstructions based on CFs that can be extracted from less
-    dimensions or through penetrable sphere model \cite{Adler_recon,Y-T,tahmasebiPRL,hasanabadi20163d,karsaninaPRL};
+    dimensions or through penetrable sphere model
+    \cite{Adler_recon,Y-T,tahmasebiPRL,hasanabadi20163d,karsaninaPRL};
   \item compare different structures to each other, including verification of
     stochastic reconstructions \cite{vcapek2009stochastic,tahmasebiPRL,EPL2};
   \item compress structural information in the form of raw or parameterized CFs
     with the possibility to recover the structure using stochastic
     reconstruction \cite{SciRep1,Havelka,KarsaninaEJSS};
-  \item describe structural dynamics under different boundary conditions \cite{chen2015dynamic,xu2022correlation,fomin2023soil};
-  \item extract structural features for deep learning \cite{pilania2017multi,kamrava2020linking,roding2020predicting,KarsaninaEJSS};
+  \item describe structural dynamics under different boundary conditions
+    \cite{chen2015dynamic,xu2022correlation,fomin2023soil};
+  \item extract structural features for deep learning
+    \cite{pilania2017multi,kamrava2020linking,roding2020predicting,KarsaninaEJSS};
   \item fuse multi-scale images and structural information as obtained by
     different methods into a single digital model \cite{Geoderma2018};
   \item quantify spatial heterogeneity \cite{zhang2000pore,REVpaper}.
@@ -102,11 +112,13 @@ many others. Computed from 2D and 3D images, CFs can be applied to:
 
 Stochastic reconstruction is a separate huge topic, as this approach allows to
 solve an inverse problem and recover structure from known set of correlation
-functions \cite{Adler_recon,Y-T,vcapek2009stochastic,hasanabadi20163d,Havelka,feng2018reconstruction,tahmasebiPRL,EPL2,thovert2011grain,tensorPRE}. This ability for recovery serves as the basis for majority of usages
-in the list above. While it is necessary to compute CFs from digital images as a
-target set for stochastic reconstructions, they rely more on efficient
-recomputations or optimizations, e.g., re-evaluation during simulated
-annealing. Such optimizations are not the part of the computational package described here and
+functions
+\cite{Adler_recon,Y-T,vcapek2009stochastic,hasanabadi20163d,Havelka,feng2018reconstruction,tahmasebiPRL,EPL2,thovert2011grain,tensorPRE}. This
+ability for recovery serves as the basis for majority of usages in the list
+above. While it is necessary to compute CFs from digital images as a target set
+for stochastic reconstructions, they rely more on efficient recomputations or
+optimizations, e.g., re-evaluation during simulated annealing. Such
+optimizations are not the part of the computational package described here and
 are not considered in this work.
 
 There are different types of correlation functions that in general describe some
@@ -190,12 +202,13 @@ supported by our package; the full list of functions is
 \item Chord length function $p$,
 \item Phase cross-correlation function $\rho_{ij}$.
 \end{itemize}
-Note that cross-correlation $\rho_{ij}$ is actually not a classical CF, but technically is a variety of $S_2$
-for the case when the end of line segment lie in different phases. This function is useful for multi-phase
-structures only, as for binary media two-point probability CFs are interdependent.
+Note that cross-correlation $\rho_{ij}$ is actually not a classical CF, but
+technically is a variety of $S_2$ for the case when the end of line segment lie
+in different phases. This function is useful for multi-phase structures only, as
+for binary media two-point probability CFs are interdependent.
 
-The most widely used is a two-point probability correlation function $S_2$, or autocorrelation. A
-definition for homogenous media is as follows:
+The most widely used is a two-point probability correlation function $S_2$, or
+autocorrelation. A definition for homogenous media is as follows:
 \begin{definition}
   Two point function $S_2^{(i)}(\bm{r})$ equals to probability that both ends
   of a vector $\bm{r}$ lie in phase $i$ when the vector is randomly thrown
@@ -221,9 +234,9 @@ $\rho_{ij}$ which is defined as follows:
   \label{eq:cross-def}
 \end{equation}
 
-Another basic correlation function is a lineal path function. It provides some non-trivial
-information (albeit usually not complete \cite{vcapek2011transport}) about the connectedness
-of the phase and is defined for homogenous media as:
+Another basic correlation function is a lineal path function. It provides some
+non-trivial information (albeit usually not complete \cite{vcapek2011transport})
+about the connectedness of the phase and is defined for homogenous media as:
 \begin{definition}
   Lineal path function $L_2^{(i)}(\bm{r})$ equals to probability that a
   vector $\bm{r}$ lies wholly in phase $i$ when randomly thrown into the
@@ -266,12 +279,12 @@ homogenous media the definitions of surface functions then are:
 \end{align}
 These functions are defined for media with dimensionality of 2 and
 higher. $F_{sv}$ is a physical quantity inversely proportional to length and
-$F_{ss}$ is inversionaly proportional to surface area. Putting it simply, 
-surface-void function measures length (2D case) or surface (3D case) of a part of the
-interface which lies in the void phase of porous medium shifted by vector $\bm{r}$. 
-Surface-surface function characterizes intersections of interfaces of porous medium and its shifted version.
-As always, there are versions of these functions applicable to scalar argument for
-isotropic media.
+$F_{ss}$ is inversionaly proportional to surface area. Putting it simply,
+surface-void function measures length (2D case) or surface (3D case) of a part
+of the interface which lies in the void phase of porous medium shifted by vector
+$\bm{r}$.  Surface-surface function characterizes intersections of interfaces of
+porous medium and its shifted version.  As always, there are versions of these
+functions applicable to scalar argument for isotropic media.
 
 Pore size function $P(\delta)$ is a probability density function defined as
 follows:
@@ -292,21 +305,22 @@ More detailed information on all classical CFs can be found in \cite{Torquato_bo
 
 \section{Computational methodology}
 
-\verb+CorrelationFunctions.jl+ is capable to compute all aforementioned correlation
-functions. Where possible we provide two implementations for each CF. The first
-implementation computes a correlation function in specific predefined directions
-(i.e., orientation of test vectors thrown into a sample is fixed) \cite{jiao2014chawla,EPL1}.
-There are one predefined direction in 1D case, four directions in 2D case 
-(two orthogonal and two diagonal) and thirteen directions in 3D case (three orthogonal, 
-six diagonal within each orthogonal plane and four diagonal). The line segment scanning
-approach is slower for some CFs but requires much less memory resources. The full map approach
-establishes correlations between all points on the image is usually faster. 
-Both implementations are contained in \code{Directional} and \code{Map}
-modules of the package, correspondingly.
+\code{CorrelationFunctions.jl} is capable to compute all aforementioned
+correlation functions. Where possible we provide two implementations for each
+CF. The first implementation computes a correlation function in specific
+predefined directions (i.e., orientation of test vectors thrown into a sample is
+fixed) \cite{jiao2014chawla,EPL1}.  There are one predefined direction in 1D
+case, four directions in 2D case (two orthogonal and two diagonal) and thirteen
+directions in 3D case (three orthogonal, six diagonal within each orthogonal
+plane and four diagonal). The line segment scanning approach is slower for some
+CFs but requires much less memory resources. The full map approach establishes
+correlations between all points on the image is usually faster.  Both
+implementations are contained in \code{Directional} and \code{Map} modules of
+the package, correspondingly.
 
-With the help of the package one can compute CFs in periodic and non-periodic modes. 
-Periodic mode assumes that an input sample is periodically continued to the whole Euclidean
-space. Non-periodic mode assumes zero-padded input.
+With the help of the package one can compute CFs in periodic and non-periodic
+modes.  Periodic mode assumes that an input sample is periodically continued to
+the whole Euclidean space. Non-periodic mode assumes zero-padded input.
 
 \subsection{Full correlation map}
 \label{sec:map}
@@ -360,16 +374,17 @@ that algorithmically operates as follows:
   \EndProcedure
 \end{algorithmic}
 
-Cluster function can be calculated with the help of previuously described procedures. 
-Firstly, we apply an indicator function to an input $A$: $A^{(i)} \xleftarrow{I^{(i)}} A$. When we
-label connected components in $A^{(i)}$ using a function that is a part of Julia \code{ImageMorphology.jl} library. 
-Labeling algorithm must take into account if the function is calculated with periodic boundary 
-conditions \cite{evstigneev2023}. For periodic boundary conditions we implemented our own solution 
-as part of the package, as it is absent in the public domain. Then $C_2$
-function is a sum of $S_2$ functions calculated for all clusters
-separately. Algorithmic complexity of this implementation is $O(MC \log M)$
-where $M$ is the number of elements in the input and $C$ is the number of
-clusters. The algorithm is then written as:
+Cluster function can be calculated with the help of previuously described
+procedures.  Firstly, we apply an indicator function to an input $A$: $A^{(i)}
+\xleftarrow{I^{(i)}} A$. When we label connected components in $A^{(i)}$ using a
+function that is a part of Julia \code{ImageMorphology.jl} library.  Labeling
+algorithm must take into account if the function is calculated with periodic
+boundary conditions \cite{evstigneev2023}. For periodic boundary conditions we
+implemented our own solution as part of the package, as it is absent in the
+public domain. Then $C_2$ function is a sum of $S_2$ functions calculated for
+all clusters separately. Algorithmic complexity of this implementation is
+$O(MC\log M)$ where $M$ is the number of elements in the input and $C$ is the
+number of clusters. The algorithm is then written as:
 \begin{algorithmic}[1]
   \Procedure{$C_2$}{$A, phase, periodic$}
   \State $A^{(phase)} \gets I^{(phase)} (A)$
@@ -379,12 +394,12 @@ clusters. The algorithm is then written as:
   \EndProcedure
 \end{algorithmic}
 
-For surface-surface and surface-void functions we use an edge detection filter \cite{samarin2023robust}
-and then calculate either autocorrelation of the edge or cross-correlation of
-the edge and the void phase. The edge is extracted by convolving an input with a
-short high-pass filter $H$. It has a width $7$ and all its coefficients with
-exception of the central coefficient are inversely proportional to distance
-from the center:
+For surface-surface and surface-void functions we use an edge detection filter
+\cite{samarin2023robust} and then calculate either autocorrelation of the edge
+or cross-correlation of the edge and the void phase. The edge is extracted by
+convolving an input with a short high-pass filter $H$. It has a width $7$ and
+all its coefficients with exception of the central coefficient are inversely
+proportional to distance from the center:
 \begin{equation}
   \begin{aligned}
     H_{ij} &= S \left\{
@@ -440,23 +455,26 @@ Using \cref{eq:cross-ft} we obtain an algorithm for surface-void function:
 
 Our library does not have an implementation for lineal-path maps, although we
 know that such implementations exist \cite{Paper}. The reason is a very slow
-computation even on GPUs, plus the resulting map is not for all points on the image,
-but within a spherical volume (due to rotation of the 3D image during lineal-path
-evaluation). Moreover, linear scan approach is orders of magnitude faster for $L_2$.
+computation even on GPUs, plus the resulting map is not for all points on the
+image, but within a spherical volume (due to rotation of the 3D image during
+lineal-path evaluation). Moreover, linear scan approach is orders of magnitude
+faster for $L_2$.
 
 All described algorithms contain parallelizable operations such as fast Fourier
 transform, connected components labeling and image filtering, hence they are
-perfectly suited for execution on GPUs and provide very fast computations (see wall times below).
+perfectly suited for execution on GPUs and provide very fast computations (see
+wall times below).
 
 \subsection{Directional scanning with line segment}
 \label{sec:scan}
-All algorithms described above (full correlation maps) are executed on the whole input and hence require
-a lot of RAM memory. The scan approach deals with memory limitations at the cost of
-higher execution time (except for $L_2$). With line-segment scanning we select a list of predefined
-directions and cut all one-dimensional slices from the input along those
-directions. Then for each direction we use an appropriate algorithm in
-\cref{sec:map} to calculate a correlation function just for that single slice. When all
-slices are processed we calculate the resulting directional or averaged CF using the formula:
+All algorithms described above (full correlation maps) are executed on the whole
+input and hence require a lot of RAM memory. The scan approach deals with memory
+limitations at the cost of higher execution time (except for $L_2$). With
+line-segment scanning we select a list of predefined directions and cut all
+one-dimensional slices from the input along those directions. Then for each
+direction we use an appropriate algorithm in \cref{sec:map} to calculate a
+correlation function just for that single slice. When all slices are processed
+we calculate the resulting directional or averaged CF using the formula:
 \begin{equation*}
   F^{\bm{d}}(r) = \frac{\sum\limits_i F^{\bm{d}}_i(r) N_i(r)}{\sum\limits_i N_i(r)}
 \end{equation*}
@@ -566,10 +584,10 @@ distance transform function defined as follows:
   \end{array}
 \right. \label{eq:distance-transform}
 \end{equation}
-For distance transform has many implementations \textcolor{red}{cite something}. In \code{chord\_length} function we
-firstly apply distance transform to an input to find the interface and then
-accumulate chord length in per-slice manner. Finally, chord lengths can be binned
-in a histogram.
+For distance transform has many implementations \textcolor{red}{cite
+  something}. In \code{chord\_length} function we firstly apply distance
+transform to an input to find the interface and then accumulate chord length in
+per-slice manner. Finally, chord lengths can be binned in a histogram.
 \begin{algorithmic}[1]
   \Procedure{chord\_length}{$A, phase$}
     \State $A' \gets I^{(phase)}(A)$
@@ -623,10 +641,10 @@ input array.
 \section{Verification of CFs compuations}
 \label{sec:verification}
 To verify all algorithms we compare their results against known closed-form
-expressions for correlation functions for some particular type of input data. One such type 
-with analytical solution is overlapping n-balls with fixed radius and centers generated
-by Poisson point process. Here we consider both two-dimensional and three-dimensional
-cases.
+expressions for correlation functions for some particular type of input
+data. One such type with analytical solution is overlapping n-balls with fixed
+radius and centers generated by Poisson point process. Here we consider both
+two-dimensional and three-dimensional cases.
 
 \subsection{Two-dimensional analytical solutions}
 Consider an infinite set of disks with radii $R$ and centers generated by
@@ -681,7 +699,8 @@ And finally pore size function $P$ \cite{Torquato_book}:
 \subsection{Three-dimensional analytical solutions}
 As in the previous case, consider an infinite set of balls with radii $R$ and
 centers generated by Poisson point process with parameter $\lambda$. Closed-form
-expressions for correlations functions are also known for this case for all CFs \cite{Torquato_book}.
+expressions for correlations functions are also known for this case for all CFs
+\cite{Torquato_book}.
 
 Two-point probability function in this case is:
 \begin{equation*}
@@ -783,8 +802,8 @@ Poisson realizations (i.e., larger images reduce deviations \cite{samarin2023rob
 \section{Applications and benchmarks}
 After the verification of our computational approach based on analytical
 solution, in this section we apply \code{CorrelationFUnctions.jl} to compute CFs
-for a variety of real 2D (SEM) and 3D (XCT) images. We also report benchmark on execution time and
-compare GPU and CPU implementations.
+for a variety of real 2D (SEM) and 3D (XCT) images. We also report benchmark on
+execution time and compare GPU and CPU implementations.
 
 \subsection{Examples of application to experimental images}
 \label{sec:examples}
