@@ -1,4 +1,4 @@
-\documentclass[reprint,amsmath,amssymb,aps,pre,showkeys,showpacs,nofootinbib]{revtex4-1}
+\documentclass[1p]{elsarticle}
 % Latex
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -10,7 +10,10 @@
 %\setmainfont{DejaVu Sans}
 %\setsansfont{DejaVu Sans}
 %\setmonofont{DejaVu Sans Mono}
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{bm}
+\usepackage{hyperref}
 \usepackage{cleveref}
 \usepackage{xcolor}
 \usepackage{algpseudocode}
@@ -25,20 +28,22 @@
 % When cleveref fails to do its job
 \newcommand{\apref}[1]{Appendix \ref{#1}}
 
+\bibliographystyle{elsarticle-num}
+\journal{Physica A: Statistical Mechanics and its Applications}
+
 \begin{document}
-\preprint{APS/123-QED}
 
-\author{Vasily Postnicov\textsuperscript{1}}
-\author{Aleksei Samarin\textsuperscript{1,2}}
-\author{Marina Karsanina\textsuperscript{1}}
-\author{Aleksey Khlyupin\textsuperscript{1}}
-\author{Kirill Gerke\textsuperscript{1}}
-\email{kg@ifz.ru}
+\author[Smith]{Vasily~Postnicov}
+\author[Smith,MIT]{Aleksei~Samarin}
+\author[Smith]{Marina~Karsanina}
+\author[Smith]{Aleksey~Khlyupin}
+\author[Smith]{Kirill~Gerke}
+\ead{kg@ifz.ru}
 
-\affiliation{\textsuperscript{1}Schmidt Institute of Physics of the Earth of
-  Russian Academy of Sciences, Moscow, 107031, Russia}
-\affiliation{\textsuperscript{2}Computational Mathematics and Cybernetics,
-  Lomonosov Moscow State University, Moscow, 119991, Russia}
+\address[Smith]{Schmidt Institute of Physics of the Earth of Russian Academy of
+  Sciences, Moscow, 107031, Russia}
+\address[MIT]{Computational Mathematics and Cybernetics, Lomonosov Moscow State
+  University, Moscow, 119991, Russia}
 
 \title{Evaluation of classical correlation functions from 2/3D images on CPU and
   GPU architectures: introducing CorrelationFunctions.jl}
@@ -830,23 +835,23 @@ can be found in \cref{tab:samples}. Correlation functions of XCT images can be
 seen on \cref{fig:real-xct} and correlation functions of SEM images are on
 \cref{fig:real-sem}.
 
-\begin{table*}[!pt]
+\begin{table}[!pt]
   \centering
-  \begin{ruledtabular}
-    \begin{tabular}{|c|c|c|c|c|}
-      Sample name & Image type & Dimensions (pixels) & Image resolution ($\mu m$) & $C_{0.5}$\\
-      \hline
-      Ceramic 1   & XCT & $500 \times 500 \times 500$ & 2.25 & 0.9823 \\
-      Ceramic 2   & XCT & $500 \times 500 \times 500$ & 2.25 & 0.9890 \\
-      Ceramic 3   & XCT & $500 \times 500 \times 500$ & 2.25 & 0.9712 \\
-      Sandstone 1 & SEM &  $1280 \times 869$ & 0.10 & 0.9703 \\
-      Sandstone 2 & SEM &  $1280 \times 869$ & 0.05 & 0.9897 \\
-      Carbonate 1 & SEM &  $1024 \times 691$ & 0.06 & 0.9721
-    \end{tabular}
-  \end{ruledtabular}
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    Sample name & Image type & Dimensions (pixels) & Image resolution ($\mu m$) & $C_{0.5}$\\
+    \hline
+    Ceramic 1   & XCT & $500 \times 500 \times 500$ & 2.25 & 0.9823 \\
+    Ceramic 2   & XCT & $500 \times 500 \times 500$ & 2.25 & 0.9890 \\
+    Ceramic 3   & XCT & $500 \times 500 \times 500$ & 2.25 & 0.9712 \\
+    Sandstone 1 & SEM &  $1280 \times 869$ & 0.10 & 0.9703 \\
+    Sandstone 2 & SEM &  $1280 \times 869$ & 0.05 & 0.9897 \\
+    Carbonate 1 & SEM &  $1024 \times 691$ & 0.06 & 0.9721 \\
+    \hline
+  \end{tabular}
   \caption{Summary of samples used for calculation of correlation functions.}
   \label{tab:samples}
-\end{table*}
+\end{table}
 
 \begin{figure*}[pt]
   \centering
@@ -925,7 +930,7 @@ require less memory.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.6\linewidth]{images/timing-image.png}
+  \includegraphics[width=0.45\linewidth]{images/timing-image.png}
   \caption[]{One of 2D image used in timing measurements.}
   \label{fig:valuenoise}
 \end{figure}
