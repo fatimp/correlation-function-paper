@@ -833,7 +833,8 @@ execution time and compare GPU and CPU implementations.
 A summary which contains information about type of the images, dimensions and resolution
 can be found in \cref{tab:samples}. Correlation functions of XCT images can be
 seen on \cref{fig:real-xct} and correlation functions of SEM images are on
-\cref{fig:real-sem}.
+\cref{fig:real-sem}. Cross-correlation funcions for a multiphase XCT image is on
+\cref{fig:real-multiphase}.
 
 \begin{table}[!pt]
   \centering
@@ -847,6 +848,9 @@ seen on \cref{fig:real-xct} and correlation functions of SEM images are on
     Sandstone 1 & SEM &  $1280 \times 869$ & 0.10 & 0.9703 \\
     Sandstone 2 & SEM &  $1280 \times 869$ & 0.05 & 0.9897 \\
     Carbonate 1 & SEM &  $1024 \times 691$ & 0.06 & 0.9721 \\
+    \hline
+    Soil (multiphase sample) & XCT & $304 \times 304 \times 304$ &
+    \textcolor{red}{2.25} & \\
     \hline
   \end{tabular}
   \caption{Summary of samples used for calculation of correlation functions.}
@@ -895,6 +899,15 @@ seen on \cref{fig:real-xct} and correlation functions of SEM images are on
   \caption[]{SEM images and plots of correlation functions for these images.}
   \label{fig:real-sem}
 \end{figure*}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.45\linewidth]{samples/multiphase.png}
+  \includegraphics[width=0.45\linewidth]{samples/multiphase-cc.png}
+  \caption[]{Cross-correlation functions for multiphase sample (soil) which has
+    4 distinct phases, labeled as 1-4.}
+  \label{fig:real-multiphase}
+\end{figure}
 
 \subsection{Execution times for our algorithms}
 \label{sec:efficiency}
