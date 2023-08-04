@@ -29,21 +29,23 @@
 \newcommand{\apref}[1]{Appendix \ref{#1}}
 
 \bibliographystyle{elsarticle-num}
-\journal{Physica A: Statistical Mechanics and its Applications}
+\journal{Computational Material Science}
 
 \begin{document}
 
 \author[Smith]{Vasily~Postnicov}
 \author[Smith,MIT]{Aleksei~Samarin}
-\author[Smith]{Marina~Karsanina}
+\author[Smith]{Marina ~V. Karsanina}
+\author[Aus]{Martieu ~Gravey}
 \author[Smith]{Aleksey~Khlyupin}
-\author[Smith]{Kirill~Gerke}
+\author[Smith]{Kirill ~M. Gerke}
 \ead{kg@ifz.ru}
 
 \address[Smith]{Schmidt Institute of Physics of the Earth of Russian Academy of
   Sciences, Moscow, 107031, Russia}
 \address[MIT]{Computational Mathematics and Cybernetics, Lomonosov Moscow State
   University, Moscow, 119991, Russia}
+\address[Aus]{Institute for Interdisciplinary Mountain Research, Austrian Academy of Sciences, Innsbruck, 6020, Austria}
 
 \title{Evaluation of classical correlation functions from 2/3D images on CPU and
   GPU architectures: introducing CorrelationFunctions.jl}
@@ -137,7 +139,7 @@ content, it was shown that increasing the number of point $n > 2$ only
 marginally improves the quality of the structure quantification and these
 improvements decay with increasing $n$ \cite{yao1993high,Gommes2}. For stochastic reconstruction purposes
 computation of higher-order statistics will, arguably, not be balanced by
-increased number of points, but this is the topic of active research. For
+increased number of points, but this is the topic of active research \cite{skolnick2021,cherkasovIC}. For
 aforementioned reasons, we mainly focus on 2-point statistics, leaving the
 possibility to include higher order CFs in the future work. The simplest 2-point
 probability function ($S_2$ or autocorrelation) actually arise from small angle
@@ -154,7 +156,7 @@ functions.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.9\linewidth]{images/corr.png}
+  \includegraphics[width=0.9\linewidth]{images/figa1.jpg}
   \caption[]{A schematic depiction of a binary porous media (pores are shown in
     color) with examples of positive events for surface $F_{ss}$, $F_{sv}$ and
     two-point probability $S_2$ correlation functions. The zoomed in area
@@ -318,7 +320,7 @@ predefined directions (i.e., orientation of test vectors thrown into a sample is
 fixed) \cite{jiao2014chawla,EPL1}.  There are one predefined direction in 1D
 case, four directions in 2D case (two orthogonal and two diagonal) and thirteen
 directions in 3D case (three orthogonal, six diagonal within each orthogonal
-plane and four diagonal). The line segment scanning approach is slower for some
+plane and four diagonal). All directions available are schematically represented in \cref{fig:directions}. The line segment scanning approach is slower for some
 CFs but requires much less memory resources. The full map approach establishes
 correlations between all points on the image is usually faster.  Both
 implementations are contained in \code{Directional} and \code{Map} modules of
@@ -326,7 +328,14 @@ the package, correspondingly.
 
 With the help of the package one can compute CFs in periodic and non-periodic
 modes.  Periodic mode assumes that an input sample is periodically continued to
-the whole Euclidean space. Non-periodic mode assumes zero-padded input.
+the whole Euclidean space. Non-periodic mode treats the input as zero-padded image.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\linewidth]{images/figa_direction.jpg}
+  \caption[]{Available directions to compute directional correlation functions in 2D and 3D cases with line scanning approach.}
+  \label{fig:directions}
+\end{figure}
 
 \subsection{Full correlation map}
 \label{sec:map}
@@ -427,7 +436,7 @@ proportional to distance from the center:
 where $C$ is such that all coefficients of $H'$ sum to zero, and $S$ equals to
 $30.45849$ in 2D and $172.96232$ in 3D case. The parameters of the filter were adjusted
 based on comparison against exact computations of surface functions on smooth-boundary
-sets \cite{Postnicov2023}.
+sets \cite{postcov23}.
 
 An algorithm for $F_{ss}$ function is the following:
 \begin{algorithmic}[1]
@@ -459,10 +468,10 @@ Using \cref{eq:cross-ft} we obtain an algorithm for surface-void function:
   \EndProcedure
 \end{algorithmic}
 
-The interface between phases must not change very rapidly for the edge filter to
+The interface between phases must not change rapidly for the edge filter to
 work correctly. Therefore, the algorithms for surface functions require input
-images to be in good resolution. A criterion for goodness can be expressed with
-$C_{\alpha}$ parameter. Let $\alpha \in [0, 1]$ and $f(x)$ be your
+images to be with an apropriate resolution. A criterion for goodness can be expressed with
+$C_{\alpha}$ parameter. Let $\alpha \in [0, 1]$ and $f(x)$ be
 (band-limited) input image ($x \in \mathbb{R}^2$ or $\mathbb{R}^3$). We define
 $C_\alpha$ as follows:
 \begin{align*}
@@ -471,18 +480,18 @@ $C_\alpha$ as follows:
     dz}{\int_{-\omega}^{\omega} |\hat{f_0}(z)|^2 dz}
 \end{align*}
 where $\hat{f_0}$ is a Fourier transform of $f_0$ and $\omega$ is a folding
-frequency which depends only on resolution of the image. Our criterion is that
-if $C_{0.5} > 0.97$ then the image is suitable for our algorithms which compute
-$F_{ss}$ and $F_{sv}$.
+frequency which depends only on resolution of the image. We have previously shown that criterion 
+$C_{0.5} > 0.97$ holds then the image is suitable for robust $F_{ss}$ and $F_{sv}$ evaluation \cite{samarin2023robust}.
+Note that function \code{lowfreq\_energy\_ratio} that computes $C_{0.5}$ criterion for any input binary image is the part of \code{CorrelationFunctions.jl} package.
 
-Our library does not have an implementation for lineal-path maps, although we
-know that such implementations exist \cite{havelkafast}. The reason is a very
+Our library does not have an implementation for lineal-path and chord-length maps, although we
+know that such implementations exist \cite{turner2016efficient,Havelka}. The reason is a very
 slow computation even on GPUs, plus the resulting map is not for all points on
 the image, but within a spherical volume (due to rotation of the 3D image during
 lineal-path evaluation). Moreover, linear scan approach is orders of magnitude
 faster for $L_2$.
 
-All described algorithms contain parallelizable operations such as fast Fourier
+Majority of described algorithms contain parallelizable operations such as fast Fourier
 transform, connected components labeling and image filtering, hence they are
 perfectly suited for execution on GPUs and provide very fast computations (see
 wall times below).
@@ -490,13 +499,13 @@ wall times below).
 \subsection{Directional scanning with line segment}
 \label{sec:scan}
 All algorithms described above (full correlation maps) are executed on the whole
-input and hence require a lot of RAM memory. The scan approach deals with memory
+input image and hence require a lot of RAM memory. The scan approach deals with memory
 limitations at the cost of higher execution time (except for $L_2$). With
 line-segment scanning we select a list of predefined directions and cut all
 one-dimensional slices from the input along those directions. Then for each
-direction we use an appropriate algorithm in \cref{sec:map} to calculate a
-correlation function just for that single slice. When all slices are processed
-we calculate the resulting directional or averaged CF using the formula:
+direction, as shown in  \cref{fig:directions}, we use an appropriate algorithm in \cref{sec:map} to calculate a
+correlation function just for that single slice. For this reason we do not repeat algorithms for $S_2$, $\rho_{ij}$, $F_{ss}$ and $F_{sv}$.
+When all slices are processed we calculate the resulting directional or averaged CF using the formula:
 \begin{equation*}
   F^{\bm{d}}(r) = \frac{\sum\limits_i F^{\bm{d}}_i(r) N_i(r)}{\sum\limits_i N_i(r)}
 \end{equation*}
@@ -509,7 +518,7 @@ for edge detection or connected components labeling performed on the whole
 array, not on slices.
 
 An algorithm for computation of linear-path function for one-dimensional slice
-is presented below. Here $a$ is a one-dimensional input array, $phase$ can be
+is presented below. Here $A$ is a one-dimensional input array, $phase$ can be
 void, solid or some other phase, and $periodic$ is a boolean value which equals
 to true if we compute $L_2$ in periodic mode and false otherwise. The efficiency
 of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
@@ -568,8 +577,8 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
 \end{algorithmic}
 
 Cluster function can be calculated using the same technique as in map approach,
-but if the number of clusters is high, a naïve $O(n^2)$ algorithm may be more
-preferred than $O(MC \log M)$ algorithm. Such an algorithm is present below:
+but if the number of clusters is high, a naïve $O(n^2)$ algorithm may be
+preferred to $O(MC \log M)$ full map algorithm. Such an approach is present below:
 \begin{algorithmic}[1]
   \Procedure{c2}{$A, phase, periodic$}
     \State $A' \gets I^{(phase)}(A)$
@@ -609,7 +618,7 @@ distance transform function defined as follows:
 There are many algorithms for distance transform, including algorithms performed
 in linear time \cite{DT}.In \code{chord\_length} function we firstly apply
 distance transform to an input to find the interface and then accumulate chord
-length in per-slice manner. Finally, chord lengths can be binned in a histogram.
+length in per-slice manner. Finally, chord lengths can be binned to a histogram.
 \begin{algorithmic}[1]
   \Procedure{chord\_length}{$A, phase$}
     \State $A' \gets I^{(phase)}(A)$
@@ -772,7 +781,7 @@ And finally pore size function $P$:
 \subsection{Comparison against analytical solutions}
 To test out package we generate a realization of random overlapping disks
 (\cref{fig:overlapping-disks}) with dimensions $10000 \times 10000$ and
-parameters $R = 40\ px$ and $\lambda = 10^{-4}\ px^{-2}$ and compare calculated
+parameters of radii $R = 40\ pixels$ and $\lambda = 10^{-4}\ pixels^{-2}$ and then compare calculated
 correlation functions with their theoretical values.
 \begin{figure}[ht]
   \centering
@@ -784,13 +793,14 @@ correlation functions with their theoretical values.
 
 For a 3D test, we generate a realization of random overlapping spheres
 (\cref{fig:overlapping-disks}) with dimensions $500 \times 500 \times 500$ and
-parameters $R = 10\ px$ and $\lambda = 10^{-4}\ px^{-3}$ and compare calculated
-correlation functions with their theoretical values. 
+$R = 10\ voxels$ and $\lambda = 10^{-4}\ voxels^{-3}$ and then compare calculated
+correlation functions with analytical solutions. 
 
 The results of comparison of computational results against analytical solutions 
 are present on \cref{fig:verification}. It is clear from the test shown that CFs 
 are computed with high accuracy; minor deviations are due to finite size of our
 Poisson realizations (i.e., larger images reduce deviations \cite{samarin2023robust}).
+The package contains automatic tests based on these comparisons.
 
 \begin{figure*}[tp]
   \centering
@@ -825,16 +835,19 @@ Poisson realizations (i.e., larger images reduce deviations \cite{samarin2023rob
 \section{Applications and benchmarks}
 After the verification of our computational approach based on analytical
 solution, in this section we apply \code{CorrelationFUnctions.jl} to compute CFs
-for a variety of real 2D (SEM) and 3D (XCT) images. We also report benchmark on
-execution time and compare GPU and CPU implementations.
+for a variety of real 2D (SEM) and 3D (XCT) images. We also report benchmarks on
+execution time and compare the efficiency of GPU and CPU implementations.
 
 \subsection{Examples of application to experimental images}
 \label{sec:examples}
-A summary which contains information about type of the images, dimensions and resolution
-can be found in \cref{tab:samples}. Correlation functions of XCT images can be
-seen on \cref{fig:real-xct} and correlation functions of SEM images are on
-\cref{fig:real-sem}. Cross-correlation funcions for a multiphase XCT image is on
-\cref{fig:real-multiphase}.
+For testing purposes we have gathered an assortment of different porous materials including XCT images of
+artificial ceramics \cite{ceramics} and natural soil composite \cite{Geoderma2018}, segmented into numerous phases,
+and SEM images of oil-bearing rocks such as sandstones and carbonate \cite{samarin2023robust}.
+A summary of this library of 2D and 3D images, including dimensions and resolutions,
+can be found in \cref{tab:samples}.
+
+Correlation functions of XCT images can be seen on \cref{fig:real-xct} and correlation functions of SEM images are on
+\cref{fig:real-sem}. Cross-correlation functions for a multiphase XCT image is on \cref{fig:real-multiphase}.
 
 \begin{table}[!pt]
   \centering
@@ -911,42 +924,40 @@ seen on \cref{fig:real-xct} and correlation functions of SEM images are on
 
 \subsection{Execution times for our algorithms}
 \label{sec:efficiency}
-To measure execution times of our algorithms we use a machine with the following
+To measure execution times for developed computational algorithms we use a machine with the following
 configuration:
 \begin{itemize}
 \item \textbf{CPU}: AMD Ryzen 7 5800X
-\item \textbf{Memory}: 32~Gb DDR4 memory
-\item \textbf{GPU}: Nvidia Tesla V100 with 32~Gb video memory
+\item \textbf{Memory}: 32~GB DDR4 memory
+\item \textbf{GPU}: Nvidia Tesla V100 with 32~GB video memory
 \end{itemize}
 
-We generate two (resp. three) dimensional square (resp. cubic) binary arrays
-with different sides. An array used for measurements contains two solid disks
-(resp. balls) surrounded by void phase.
+We generate 2 and 3-dimensional square/cubical binary arrays
+with different width (see insets on \cref{fig:timings}). An array used for measurements contains two solid disks
+or balls surrounded by void phase. This configuration is a compromise between ease of
+image scaling and complexity of the structure (e.g., full map $C_2$ computational time
+is not compromised by too many clusters).
 
-To measure efficiency of our code we generate six arrays with a side of a square
+We generated six arrays with dimensions of
 $s = 1000, 2000, \dots, 6000$ pixels for two-dimensional case and six arrays
 with a side of a cube $s = 50, 100, \dots, 300$ voxels for three-dimensional
-case and calculate execution time for each function. All functions are
+case and calculated execution time for each correlation function. All functions are
 calculated using periodic boundary conditions. Functions which use per-slice
-directional approach are calculated along axial directions.
+directional approach were calculated along major axial directions only.
 
-Functions which calculate full correlation maps are suitable for running on CPU
-and GPU, so we provide execution times for both. The cluster function still uses
-an algorithm for closest component labeling which works only on CPU, so there is
-a potentional for improvement for this function.
+Functions which calculate full correlation maps are suitable for running on both CPU
+and GPU, so we provide execution times for both. The cluster function uses
+an algorithm for closest component labeling which has CPU-only implementation (thus,
+leaving a room for future improvements). Directional computations are performed exclusively
+on CPUs.
 
-The measurements of execution time is on \cref{fig:timings}. As you can see, GPU
-versions (when available) are faster than CPU versions and limited only by
+All measurements of execution time are presented on \cref{fig:timings}. It is immediately apparent that GPU
+versions (where available) are much faster than CPU versions and limited only by
 amount of video memory. Functions in module \code{Directional} (which utilize
 per-slice directional approach) are the slowest among other implementations, but
-require less memory.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.45\linewidth]{images/timing-image.png}
-  \caption[]{One of 2D image used in timing measurements.}
-  \label{fig:valuenoise}
-\end{figure}
+require less memory. Depending on CF, our video card with 24 GBs of memory could handle a cube of
+~$300^3$ voxels, whilst the workstation with 512-1024 GBs of RAM can handle virtually any XCT-obtained
+image volume with any correlation length.
 
 \begin{figure*}[t]
   \centering
@@ -978,6 +989,38 @@ require less memory.
 \end{figure*}
 
 \section{Discussion and outlook}
+In the light of the end of the previous section it is important to clarify that available
+(video) RAM or speed of computations are not the only considerations behind choosing between full correlation map
+and directional linear scan. Directional CFs are extremely useful in describing or reconstructing
+anisotropic structures \cite{jiao2014chawla,EPL1,tensorPRE}. At the same time, they also much easier to
+work with and good candidates for data compression and feature extraction \cite{KarsaninaEJSS}. On the other hand,
+full map for $S_2$ allows computing ensemble averaged two-point probability - in the similar fashion it is
+measured with scattering experiments. The usefulness of full correlation maps for other CFs is questionable,
+as they are either non-measurable experimentally, e.g., \cite{Gommes_notchord}, or non-applicable for stochastic reconstructions.
+The latter refers to our ability to reconstruct almost any structure from its $S_2$ map \cite{fullwood2008}. And while we
+have fast and efficient techniques such as phase-recovery to reconstruct the structure from its $S_2$ correlation map, the utilization
+of other CFs is complicated \cite{cherkasov2021,cherkasovIC}. Simulated-annealing based methods that operate on the full map are, 
+to the best of our knowledge, were not developed to date. This is the reason we did not invest into improvement on existing approaches to compute maps for $L_2$.
+
+The trade-off in using full map or directional CFs is closely related to the information content of correlation
+functions \cite{Gommes1,Gommes2,skolnick2021}. Any reduction of the full map into ensemble averaged or
+directionally computed CFs significantly decreases the information available. On the other hand, full correlation map is
+larger than the image itself and, thus, storing such huge amount of data for already voluminous datasets is not practical.
+Vectorization of directional correlation functions is, thus, seems like a natural feature reduction approach while
+working with correlation maps. As applied to stochastic reconstructions, similar logic applies -
+it seems to be beneficial to increase the number of functions rather than their "volume". Full correlation maps
+are usually not available unless the structure is already known; but they may be useful in the form of 2D maps
+available from images for 3D reconstructions \cite{cherkasov2021}. Wether reconstructions of, say, full 3D maps
+based on 2D maps is a better approach than using directional CFs computed from images for stochastic reconstructions
+is an open question. Simulated annealing based methods were developed in the first place due to absence of
+methods like phase-recovery for correlation functions other than autocorrelation $S_2$. We believe that our fast and robust
+computational framework in the form of \code{CorrelationFunctions.jl} package will facilitate research in these areas.
+
+
+
+
+
+
 When to use map and when to use linear scan
   memory
   how fast
@@ -989,6 +1032,8 @@ Why we need more functions? Information content
 Or may be we need more CFs? Add topology (Zubov)?
 GPU computations are limited by RAM - if we are interested in correlation length of width of cube that can be
 put into GPU card memory - we can ensemble by computation in subcubes (possible future upodates)
+clusterization on GPUs
+Numerous directions or solid angle
 
 \section{Summary}
 \label{sec:summary}
@@ -998,8 +1043,8 @@ Text
 \section{Computation of number of trials for non-periodic mode}
 \label{sec:number-of-trials}
 Here we assume that an input is padded with zeros to the length $2s_i - 1$
-across each dimension $i$ where $s_i$ is the size of the unpadded input in that
-dimension. For each dimension we calculate a sequence
+across each dimension $i$ where $s_i$ is the size of the non-padded input in that respective
+dimension. For each dimension we calculate a sequence:
 \begin{equation*}
   N^i_j = \left\{
   \begin{array}{cc}
