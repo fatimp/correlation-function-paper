@@ -840,14 +840,18 @@ execution time and compare the efficiency of GPU and CPU implementations.
 
 \subsection{Examples of application to experimental images}
 \label{sec:examples}
-For testing purposes we have gathered an assortment of different porous materials including XCT images of
-artificial ceramics \cite{ceramics} and natural soil composite \cite{Geoderma2018}, segmented into numerous phases,
-and SEM images of oil-bearing rocks such as sandstones and carbonate \cite{samarin2023robust}.
-A summary of this library of 2D and 3D images, including dimensions and resolutions,
-can be found in \cref{tab:samples}.
+For testing purposes we have gathered an assortment of different porous
+materials including XCT images of artificial ceramics \cite{ceramics} and
+natural soil composite \cite{Geoderma2018}, segmented into numerous phases, and
+SEM images of oil-bearing rocks such as sandstones and carbonate
+\cite{samarin2023robust}.  A summary of this library of 2D and 3D images,
+including dimensions and resolutions, can be found in \cref{tab:samples}.
 
-Correlation functions of XCT images can be seen on \cref{fig:real-xct} and correlation functions of SEM images are on
-\cref{fig:real-sem}. Cross-correlation functions for a multiphase XCT image is on \cref{fig:real-multiphase}.
+Correlation functions of XCT images can be seen on \cref{fig:real-xct} and
+correlation functions of SEM images are on
+\cref{fig:real-sem}. Cross-correlation functions for a multiphase XCT image is
+on \cref{fig:real-multiphase}. Correlation maps for one of SEM samples are of
+\cref{fig:real-sem-map}.
 
 \begin{table}[!pt]
   \centering
@@ -917,6 +921,23 @@ Correlation functions of XCT images can be seen on \cref{fig:real-xct} and corre
   \includegraphics[width=0.32\linewidth]{samples/chord-length-sem.png}
   \caption[]{SEM images and plots of correlation functions for these images.}
   \label{fig:real-sem}
+\end{figure*}
+
+\begin{figure*}[pt]
+  \centering
+  \subfigure[$S_2$]{
+    \includegraphics[width=0.45\linewidth]{samples/map-s2.png}}
+  \hfill
+  \subfigure[$C_2$]{
+    \includegraphics[width=0.45\linewidth]{samples/map-c2.png}}
+  \vskip\baselineskip
+  \subfigure[$F_{ss}$]{
+    \includegraphics[width=0.45\linewidth]{samples/map-surf2.png}}
+  \hfill
+  \subfigure[$F_{sv}$]{
+    \includegraphics[width=0.45\linewidth]{samples/map-surfvoid.png}}
+  \caption[]{Correlation maps for Sandstone 1.}
+  \label{fig:real-sem-map}
 \end{figure*}
 
 \begin{figure}[ht]
