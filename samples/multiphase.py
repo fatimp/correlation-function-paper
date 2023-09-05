@@ -11,7 +11,7 @@ plt.rc('font', size = 25)
 for pair in pairs:
     p1, p2 = pair
     data = np.load('multiphase-%i-%i.npy' % (p1 - 1, p2 - 1))
-    xs = np.arange(0, data.size) * 2.25
+    xs = np.arange(0, data.size) * 15.0
     plt.plot(xs, data)
 
 plt.legend(list(map(lambda x: r'$\rho_{%i%i}$' % x, pairs)))
