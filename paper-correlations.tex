@@ -51,19 +51,39 @@
   GPU architectures: introducing CorrelationFunctions.jl}
 
 \begin{abstract}
-Correlation functions are becoming one of the major tools for quantification of structural information that is usually represented as material's 2D or 3D image.
-In this paper we introduce \code{CorrelationFunctions.jl} open-source package developed in Julia and capable of computing all classical
-correlation functions based on imaging input data. Images include both binary and multi-phase representations.
-Our code is capable of evaluating two-point probability $S_2$, cluster $C_2$, lineal-path $L_2$, surface-surface $F_{ss}$,
-surface-void $F_{sv}$, pore-size $P$ and chord-length $p$ functions on both CPU and GPU architectures.
-There possible, we presented two types of computations: full correlation map (correlations of each point with other pints on the image, that also allows obtaining ensemble averaged CF) and directional correlation functions (currently in major orthogonal and diagonal directions). 
-Such an implementation allowed for the first time to assemble a completely free solution to evaluate correlation functions under any operating system with well documented application programming interface (API). Our package includes automatic tests against analytical solutions that are described in the paper. We measured wall times for all CPU and GPU implementations and as a rule of thumb full correlation maps on GPU are faster than directional scans using CPU due to the usage of fast Fourier transform. However, full maps require more RAM and, thus, are limited to available GPU RAM resources. On the other hand, directional CFs are memory efficient and can be evaluated for huge datasets - this way they are the first candidates for
-structural data compression of feature extraction. The package itself is available through Julia package ecosystem and on GitHub 
-(https://github.com/fatimp/CorrelationFunctions.jl), the latter source also contains documentation and additional helpful resources such as tutorials.
-We believe that a single powerful computational tool such as \code{CorrelationFunctions.jl} will significantly facilitate the usage of correlation
-functions in numerous areas of structural description and research, as well as in machine learning applications. We also present some example as applied to
-ceramic, soil composite and oil-bearing rock samples based on their 3D X-ray tomography and 2D scanning electron microscope images. Finally, we conclude our paper with
-discussion of possible ways to further improve presented computational framework.
+Correlation functions are becoming one of the major tools for quantification of
+structural information that is usually represented as material's 2D or 3D image.
+In this paper we introduce \code{CorrelationFunctions.jl} open-source package
+developed in Julia and capable of computing all classical correlation functions
+based on imaging input data. Images include both binary and multi-phase
+representations.  Our code is capable of evaluating two-point probability $S_2$,
+cluster $C_2$, lineal-path $L_2$, surface-surface $F_{ss}$, surface-void
+$F_{sv}$, pore-size $P$ and chord-length $p$ functions on both CPU and GPU
+architectures.  There possible, we presented two types of computations: full
+correlation map (correlations of each point with other pints on the image, that
+also allows obtaining ensemble averaged CF) and directional correlation
+functions (currently in major orthogonal and diagonal directions).  Such an
+implementation allowed for the first time to assemble a completely free solution
+to evaluate correlation functions under any operating system with well
+documented application programming interface (API). Our package includes
+automatic tests against analytical solutions that are described in the paper. We
+measured wall times for all CPU and GPU implementations and as a rule of thumb
+full correlation maps on GPU are faster than directional scans using CPU due to
+the usage of fast Fourier transform. However, full maps require more RAM and,
+thus, are limited to available GPU RAM resources. On the other hand, directional
+CFs are memory efficient and can be evaluated for huge datasets - this way they
+are the first candidates for structural data compression of feature
+extraction. The package itself is available through Julia package ecosystem and
+on GitHub (https://github.com/fatimp/CorrelationFunctions.jl), the latter source
+also contains documentation and additional helpful resources such as tutorials.
+We believe that a single powerful computational tool such as
+\code{CorrelationFunctions.jl} will significantly facilitate the usage of
+correlation functions in numerous areas of structural description and research,
+as well as in machine learning applications. We also present some example as
+applied to ceramic, soil composite and oil-bearing rock samples based on their
+3D X-ray tomography and 2D scanning electron microscope images. Finally, we
+conclude our paper with discussion of possible ways to further improve presented
+computational framework.
 \end{abstract}
 
 \maketitle
@@ -87,8 +107,8 @@ is noteworthy that many of such bounds are originally based on structural
 descriptors in the form of correlation functions (CFs).
 
 Two ways exist to obtain correlation functions for a given structure at hand:
-measure them either experimentally with the help of, for example, scattering intensity
-\cite{debye1957scattering,li2018direct} or from digital images
+measure them either experimentally with the help of, for example, scattering
+intensity \cite{debye1957scattering,li2018direct} or from digital images
 \cite{berryman1985measurement,ma2018SS}. None is perfect, as the first approach
 suffers from the limitation of CFs that can be obtained this way, while the
 second one provides information with limited resolution or/and resolution to
@@ -149,30 +169,32 @@ structure in the limit of $n \rightarrow$ number of voxels/pixels on the image,
 computing or storing such a function is not practical. Based on information
 content, it was shown that increasing the number of point $n > 2$ only
 marginally improves the quality of the structure quantification and these
-improvements decay with increasing $n$ \cite{yao1993high,Gommes2}. For stochastic reconstruction purposes
-computation of higher-order statistics will, arguably, not be balanced by
-increased number of points, but this is the topic of active research \cite{skolnick2021,cherkasovIC}. For
-aforementioned reasons, we mainly focus on 2-point statistics, leaving the
-possibility to include higher order CFs in the future work. The simplest 2-point
-probability function ($S_2$ or autocorrelation) actually arise from small angle
-scattering experiments and measures the probability that both ends of line
-segment with a given length fall into the same phase. Other types include the
-probability of a whole line segment to fall into the phase ($L_2$ function) or
-to lie on the interface between phases ($F_{ss}$ function), and mainly originated
-from aforementioned bounds on physical properties such as permeability and
-elasticity. The general idea of computation of different 2-point CFs is shown in
-\cref{fig:functions}. All major details and numerous analytical cases can be
-found in seminal work of Torquato \cite{Torquato_book}. To all CFs described in this
-book and applicable to digital images we shall refer to as classical correlation
-functions.
+improvements decay with increasing $n$ \cite{yao1993high,Gommes2}. For
+stochastic reconstruction purposes computation of higher-order statistics will,
+arguably, not be balanced by increased number of points, but this is the topic
+of active research \cite{skolnick2021,cherkasovIC}. For aforementioned reasons,
+we mainly focus on 2-point statistics, leaving the possibility to include higher
+order CFs in the future work. The simplest 2-point probability function ($S_2$
+or autocorrelation) actually arise from small angle scattering experiments and
+measures the probability that both ends of line segment with a given length fall
+into the same phase. Other types include the probability of a whole line segment
+to fall into the phase ($L_2$ function) or to lie on the interface between
+phases ($F_{ss}$ function), and mainly originated from aforementioned bounds on
+physical properties such as permeability and elasticity. The general idea of
+computation of different 2-point CFs is shown in \cref{fig:functions}. All major
+details and numerous analytical cases can be found in seminal work of Torquato
+\cite{Torquato_book}. To all CFs described in this book and applicable to
+digital images we shall refer to as classical correlation functions.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.9\linewidth]{images/cf_1.png}
-  \caption[]{A schematic representation of a binary porous media (pores are shaded) 
-  with examples of CFs computations (all classical correlation functions are presented
-  according to the legend on the right side). Computations are results of individual
-  events (producing either 0 or 1) ensemble averaged over the image, direction or represented as full correlation map.}
+  \caption[]{A schematic representation of a binary porous media (pores are
+    shaded) with examples of CFs computations (all classical correlation
+    functions are presented according to the legend on the right
+    side). Computations are results of individual events (producing either 0 or
+    1) ensemble averaged over the image, direction or represented as full
+    correlation map.}
   \label{fig:functions}
 \end{figure}
 
@@ -322,7 +344,6 @@ touches the interface with its ends.
 More detailed information on all classical CFs can be found in \cite{Torquato_book}.
 
 \section{Computational methodology}
-
 \code{CorrelationFunctions.jl} is capable to compute all aforementioned
 correlation functions. Where possible we provide two implementations for each
 CF. The first implementation computes a correlation function in specific
@@ -330,11 +351,13 @@ predefined directions (i.e., orientation of test vectors thrown into a sample is
 fixed) \cite{jiao2014chawla,EPL1}.  There are one predefined direction in 1D
 case, four directions in 2D case (two orthogonal and two diagonal) and thirteen
 directions in 3D case (three orthogonal, six diagonal within each orthogonal
-plane and four diagonal). All directions available are schematically represented in \cref{fig:directions}. The line segment scanning approach is slower for some
+plane and four diagonal). All directions available are schematically represented
+in \cref{fig:directions}. The line segment scanning approach is slower for some
 CFs but requires much less memory resources. The full map approach establishes
-correlations between all points on the image is usually faster, as it leverages on Fast Fourier Transform computational speed.  Both
-implementations are contained in \code{Directional} and \code{Map} modules of
-the package, correspondingly.
+correlations between all points on the image is usually faster, as it leverages
+on Fast Fourier Transform computational speed.  Both implementations are
+contained in \code{Directional} and \code{Map} modules of the package,
+correspondingly.
 
 With the help of the package one can compute CFs in periodic and non-periodic
 modes.  Periodic mode assumes that an input sample is periodically continued to
@@ -343,7 +366,8 @@ the whole Euclidean space. Non-periodic mode treats the input as zero-padded ima
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.9\linewidth]{images/cf_diag.png}
-  \caption[]{Available directions to compute directional correlation functions in 2D and 3D cases with line scanning approach.}
+  \caption[]{Available directions to compute directional correlation functions
+    in 2D and 3D cases with line scanning approach.}
   \label{fig:directions}
 \end{figure}
 
@@ -490,32 +514,37 @@ $C_\alpha$ as follows:
     dz}{\int_{-\omega}^{\omega} |\hat{f_0}(z)|^2 dz}
 \end{align*}
 where $\hat{f_0}$ is a Fourier transform of $f_0$ and $\omega$ is a folding
-frequency which depends only on resolution of the image. We have previously shown that criterion 
-$C_{0.5} > 0.97$ holds then the image is suitable for robust $F_{ss}$ and $F_{sv}$ evaluation \cite{samarin2023robust}.
-Note that function \code{lowfreq\_energy\_ratio} that computes $C_{0.5}$ criterion for any input binary image is the part of \code{CorrelationFunctions.jl} package.
+frequency which depends only on resolution of the image. We have previously
+shown that criterion $C_{0.5} > 0.97$ holds then the image is suitable for
+robust $F_{ss}$ and $F_{sv}$ evaluation \cite{samarin2023robust}.  Note that
+function \code{lowfreq\_energy\_ratio} that computes $C_{0.5}$ criterion for any
+input binary image is the part of \code{CorrelationFunctions.jl} package.
 
-Our library does not have an implementation for lineal-path and chord-length maps, although we
-know that such implementations exist \cite{turner2016efficient,Havelka}. The reason is a very
-slow computation even on GPUs or the resulting map is not for all points on
-the image, but within a spherical volume (due to rotation of the 3D image during
-lineal-path evaluation). Moreover, linear scan approach is orders of magnitude
-faster for $L_2$.
+Our library does not have an implementation for lineal-path and chord-length
+maps, although we know that such implementations exist
+\cite{turner2016efficient,Havelka}. The reason is a very slow computation even
+on GPUs or the resulting map is not for all points on the image, but within a
+spherical volume (due to rotation of the 3D image during lineal-path
+evaluation). Moreover, linear scan approach is orders of magnitude faster for
+$L_2$.
 
-Majority of described algorithms contain parallelizable operations such as fast Fourier
-transform, connected components labeling and image filtering, hence they are
-perfectly suited for execution on GPUs and provide very fast computations (see
-wall times below).
+Majority of described algorithms contain parallelizable operations such as fast
+Fourier transform, connected components labeling and image filtering, hence they
+are perfectly suited for execution on GPUs and provide very fast computations
+(see wall times below).
 
 \subsection{Directional scanning with line segment}
 \label{sec:scan}
 All algorithms described above (full correlation maps) are executed on the whole
-input image and hence require a lot of RAM memory. The scan approach deals with memory
-limitations at the cost of higher execution time (except for $L_2$). With
+input image and hence require a lot of RAM memory. The scan approach deals with
+memory limitations at the cost of higher execution time (except for $L_2$). With
 line-segment scanning we select a list of predefined directions and cut all
 one-dimensional slices from the input along those directions. Then for each
-direction, as shown in  \cref{fig:directions}, we use an appropriate algorithm in \cref{sec:map} to calculate a
-correlation function just for that single slice. For this reason we do not repeat algorithms for $S_2$, $\rho_{ij}$, $F_{ss}$ and $F_{sv}$.
-When all slices are processed we calculate the resulting directional or averaged CF using the formula:
+direction, as shown in \cref{fig:directions}, we use an appropriate algorithm in
+\cref{sec:map} to calculate a correlation function just for that single
+slice. For this reason we do not repeat algorithms for $S_2$, $\rho_{ij}$,
+$F_{ss}$ and $F_{sv}$.  When all slices are processed we calculate the resulting
+directional or averaged CF using the formula:
 \begin{equation*}
   F^{\bm{d}}(r) = \frac{\sum\limits_i F^{\bm{d}}_i(r) N_i(r)}{\sum\limits_i N_i(r)}
 \end{equation*}
@@ -791,8 +820,8 @@ And finally pore size function $P$:
 \subsection{Comparison against analytical solutions}
 To test out package we generate a realization of random overlapping disks
 (\cref{fig:overlapping-disks}) with dimensions $10000 \times 10000$ and
-parameters of radii $R = 40\ pixels$ and $\lambda = 10^{-4}\ pixels^{-2}$ and then compare calculated
-correlation functions with their theoretical values.
+parameters of radii $R = 40\ pixels$ and $\lambda = 10^{-4}\ pixels^{-2}$ and
+then compare calculated correlation functions with their theoretical values.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.45\linewidth]{images/disks.png}
@@ -878,17 +907,23 @@ including dimensions and resolutions, can be found in \cref{tab:samples}.
   \label{tab:samples}
 \end{table}
 
-At first, we compare the three ceramic images which have somewhat different genesis depending on the mixture
-ratio of powder and binder used for firing the material \cite{ceramics}. As observed from \cref{fig:real-xct}, the structure of
-all three samples is visually very similar. The lineal path function supports this observation. The $S_2$ functions are
-also quite similar except for Sample 2 having higher porosity that results in elevated curve (the tail for two-point probability
-as expected fluctuates around porosity squared). Notably, $S_2$ and $C_2$ are almost identical - this indicates that
-pore phase represents a single large cluster. Recall that for $S_2$, $C_2$ and $L_2$ functions the value at correlation length
-of 0 is the porosity value. Surface functions, on the other hand, feel significant difference between samples in
-how pore-solid interface is organized. This is further evidenced on pore-size and chord-length graphs, with Ceramic 2
-sample with the highest porosity having larger amount of large pores. Both $P$ and $p$ show very similar behavior,
-but for different correlation lengths; such behavior is attributed to quite regular pores shapes in all ceramics samples -
-this is evident from much larger differences between pore-size and chord-length for SEM images considered next.
+At first, we compare the three ceramic images which have somewhat different
+genesis depending on the mixture ratio of powder and binder used for firing the
+material \cite{ceramics}. As observed from \cref{fig:real-xct}, the structure of
+all three samples is visually very similar. The lineal path function supports
+this observation. The $S_2$ functions are also quite similar except for Sample 2
+having higher porosity that results in elevated curve (the tail for two-point
+probability as expected fluctuates around porosity squared). Notably, $S_2$ and
+$C_2$ are almost identical -- this indicates that pore phase represents a single
+large cluster. Recall that for $S_2$, $C_2$ and $L_2$ functions the value at
+correlation length of 0 is the porosity value. Surface functions, on the other
+hand, feel significant difference between samples in how pore-solid interface is
+organized. This is further evidenced on pore-size and chord-length graphs, with
+Ceramic 2 sample with the highest porosity having larger amount of large
+pores. Both $P$ and $p$ show very similar behavior, but for different
+correlation lengths; such behavior is attributed to quite regular pores shapes
+in all ceramics samples -- this is evident from much larger differences between
+pore-size and chord-length for SEM images considered next.
 
 \begin{figure*}[pt]
   \centering
@@ -915,21 +950,33 @@ this is evident from much larger differences between pore-size and chord-length 
   \label{fig:real-xct}
 \end{figure*}
 
-The \cref{fig:real-sem} presents three 2D images of sandstones and carbonate with computed correlation functions. In this example,
-unlike for quite isotropic ceramics, we evaluated CFs in the directional manner. The $S_2$ graph immediately provides us
-with porosity values. It also highlights severe anisotropy in sandstone SEM images. For 2D images numerous patches of pores are
-not connected to each other and, thus, $S_2$ and $C_2$ are very different. Cluster functions show how connectivity decays with
-length, also we can easily observe if given pore structure percolates in a given direction - none of the images percolates
-(we highlighted the clusters to make this statement easily verifiable with the naked eye). Note that $C_2$ and $L_2$ were computed
-with correlations lengths equal to image dimensions explore connectivity - for other CFs this leads to noised curves due to smaller number of sampled points (for example, see correlation functions' graphs in \cite{Euras2012}).
-Lineal paths are close for sandstones (with lower $L_2$ values for Sandstone 1 where large pores are occluded with clays or grain fragments),
-but for carbonate with much smaller apertures of pores it is way below $L_2$ for sandstones. Also, $L_2$ suggests that computations
-with correlations lengths beyond where lineal path goes to zero are not very informative. For very irregular pores on 2D SEM images,
-$P$ and $p$ functions look much less similar compared to the ceramics case on \cref{fig:real-xct}. For 2D images it is also visually
-easy to analyze full CF maps, as presented on \cref{fig:real-sem-map} for Sandstone 1 sample. Full correlation maps show expanded version of directional functions -
-asymmetry is immediately evidenced from $S_2$, $F_{ss}$ and $F_{sv}$ maps. Moreover, the map for $C_2$ shows higher connectivity in y-direction
-as compared to x-axis. The interpretation of full correlation maps is less straightforward, but anisotropy patterns in directions different from
-those presented in \cref{fig:directions} can be spotted.
+The \cref{fig:real-sem} presents three 2D images of sandstones and carbonate
+with computed correlation functions. In this example, unlike for quite isotropic
+ceramics, we evaluated CFs in the directional manner. The $S_2$ graph
+immediately provides us with porosity values. It also highlights severe
+anisotropy in sandstone SEM images. For 2D images numerous patches of pores are
+not connected to each other and, thus, $S_2$ and $C_2$ are very
+different. Cluster functions show how connectivity decays with length, also we
+can easily observe if given pore structure percolates in a given direction -
+none of the images percolates (we highlighted the clusters to make this
+statement easily verifiable with the naked eye). Note that $C_2$ and $L_2$ were
+computed with correlations lengths equal to image dimensions explore
+connectivity -- for other CFs this leads to noised curves due to smaller number
+of sampled points (for example, see correlation functions' graphs in
+\cite{Euras2012}).  Lineal paths are close for sandstones (with lower $L_2$
+values for Sandstone 1 where large pores are occluded with clays or grain
+fragments), but for carbonate with much smaller apertures of pores it is way
+below $L_2$ for sandstones. Also, $L_2$ suggests that computations with
+correlations lengths beyond where lineal path goes to zero are not very
+informative. For very irregular pores on 2D SEM images, $P$ and $p$ functions
+look much less similar compared to the ceramics case on \cref{fig:real-xct}. For
+2D images it is also visually easy to analyze full CF maps, as presented on
+\cref{fig:real-sem-map} for Sandstone 1 sample. Full correlation maps show
+expanded version of directional functions -- asymmetry is immediately evidenced
+from $S_2$, $F_{ss}$ and $F_{sv}$ maps. Moreover, the map for $C_2$ shows higher
+connectivity in y-direction as compared to x-axis. The interpretation of full
+correlation maps is less straightforward, but anisotropy patterns in directions
+different from those presented in \cref{fig:directions} can be spotted.
 
 \begin{figure*}[pt]
   \centering
@@ -995,45 +1042,48 @@ represented by any other phase or their superposition.
   \label{fig:real-multiphase}
 \end{figure}
 
-This section clearly demonstrated, that \code{CorrelationFunctions.jl} can be utilized in analysis of any 2D and 3D images, including structures
-consisting of numerous phases.
+This section clearly demonstrated, that \code{CorrelationFunctions.jl} can be
+utilized in analysis of any 2D and 3D images, including structures consisting of
+numerous phases.
 
 \subsection{Execution times for our algorithms}
 \label{sec:efficiency}
-To measure execution times for developed computational algorithms we use a machine with the following
-configuration:
+To measure execution times for developed computational algorithms we use a
+machine with the following configuration:
 \begin{itemize}
 \item \textbf{CPU}: AMD Ryzen 7 5800X
 \item \textbf{Memory}: 32~GB DDR4 memory
 \item \textbf{GPU}: Nvidia Tesla V100 with 32~GB video memory
 \end{itemize}
 
-We generate 2 and 3-dimensional square/cubical binary arrays
-with different width (see insets on \cref{fig:timings}). An array used for measurements contains two solid disks
-or balls surrounded by void phase. This configuration is a compromise between ease of
-image scaling and complexity of the structure (e.g., full map $C_2$ computational time
-is not compromised by too many clusters).
+We generate 2 and 3-dimensional square/cubical binary arrays with different
+width (see insets on \cref{fig:timings}). An array used for measurements
+contains two solid disks or balls surrounded by void phase. This configuration
+is a compromise between ease of image scaling and complexity of the structure
+(e.g., full map $C_2$ computational time is not compromised by too many
+clusters).
 
-We generated six arrays with dimensions of
-$s = 1000, 2000, \dots, 6000$ pixels for two-dimensional case and six arrays
-with a side of a cube $s = 50, 100, \dots, 300$ voxels for three-dimensional
-case and calculated execution time for each correlation function. All functions are
-calculated using periodic boundary conditions. Functions which use per-slice
-directional approach were calculated along major axial directions only.
+We generated six arrays with dimensions of $s = 1000, 2000, \dots, 6000$ pixels
+for two-dimensional case and six arrays with a side of a cube $s = 50, 100,
+\dots, 300$ voxels for three-dimensional case and calculated execution time for
+each correlation function. All functions are calculated using periodic boundary
+conditions. Functions which use per-slice directional approach were calculated
+along major axial directions only.
 
-Functions which calculate full correlation maps are suitable for running on both CPU
-and GPU, so we provide execution times for both. The cluster function uses
-an algorithm for closest component labeling which has CPU-only implementation (thus,
-leaving a room for future improvements). Directional computations are performed exclusively
-on CPUs.
+Functions which calculate full correlation maps are suitable for running on both
+CPU and GPU, so we provide execution times for both. The cluster function uses
+an algorithm for closest component labeling which has CPU-only implementation
+(thus, leaving a room for future improvements). Directional computations are
+performed exclusively on CPUs.
 
-All measurements of execution time are presented on \cref{fig:timings}. It is immediately apparent that GPU
-versions (where available) are much faster than CPU versions and limited only by
-amount of video memory. Functions in module \code{Directional} (which utilize
-per-slice directional approach) are the slowest among other implementations, but
-require less memory. Depending on CF, our video card with 24 GBs of memory could handle a cube of
-~$300^3$ voxels, whilst the workstation with 512-1024 GBs of RAM can handle virtually any XCT-obtained
-image volume with any correlation length.
+All measurements of execution time are presented on \cref{fig:timings}. It is
+immediately apparent that GPU versions (where available) are much faster than
+CPU versions and limited only by amount of video memory. Functions in module
+\code{Directional} (which utilize per-slice directional approach) are the
+slowest among other implementations, but require less memory. Depending on CF,
+our video card with 24 GBs of memory could handle a cube of $\sim 300^3$
+voxels, whilst the workstation with 512-1024 GBs of RAM can handle virtually any
+XCT-obtained image volume with any correlation length.
 
 \begin{figure*}[t]
   \centering
@@ -1065,65 +1115,99 @@ image volume with any correlation length.
 \end{figure*}
 
 \section{Discussion and outlook}
-In the light of the end of the previous section it is important to clarify that available
-(video) RAM or speed of computations are not the only considerations behind choosing between full correlation map
-and directional linear scans. Directional CFs are extremely useful in describing or reconstructing
-anisotropic structures \cite{jiao2014chawla,EPL1,tensorPRE}. At the same time, they also much easier to
-work with and good candidates for data compression and feature extraction \cite{KarsaninaEJSS}. On the other hand,
-full map for $S_2$ allows computing ensemble averaged two-point probability -- in the similar fashion it is
-measured with scattering experiments. The usefulness of full correlation maps for other CFs is questionable,
-as they are either non-measurable experimentally, e.g., \cite{Gommes_notchord}, or non-applicable for stochastic reconstructions.
-The latter refers to our ability to reconstruct almost any structure from its $S_2$ map \cite{fullwood2008}. And while we
-have fast and efficient techniques such as phase-recovery to reconstruct the structure from its $S_2$ correlation map, the utilization
-of other CFs is complicated \cite{cherkasov2021,cherkasovIC}. Simulated-annealing based methods that operate on the full map are, 
-to the best of our knowledge, were not developed to date. This is the reason we did not invest into improvement on existing approaches to compute maps for $L_2$.
+In the light of the end of the previous section it is important to clarify that
+available (video) RAM or speed of computations are not the only considerations
+behind choosing between full correlation map and directional linear
+scans. Directional CFs are extremely useful in describing or reconstructing
+anisotropic structures \cite{jiao2014chawla,EPL1,tensorPRE}. At the same time,
+they also much easier to work with and good candidates for data compression and
+feature extraction \cite{KarsaninaEJSS}. On the other hand, full map for $S_2$
+allows computing ensemble averaged two-point probability -- in the similar
+fashion it is measured with scattering experiments. The usefulness of full
+correlation maps for other CFs is questionable, as they are either
+non-measurable experimentally, e.g., \cite{Gommes_notchord}, or non-applicable
+for stochastic reconstructions.  The latter refers to our ability to reconstruct
+almost any structure from its $S_2$ map \cite{fullwood2008}. And while we have
+fast and efficient techniques such as phase-recovery to reconstruct the
+structure from its $S_2$ correlation map, the utilization of other CFs is
+complicated \cite{cherkasov2021,cherkasovIC}. Simulated-annealing based methods
+that operate on the full map are, to the best of our knowledge, were not
+developed to date. This is the reason we did not invest into improvement on
+existing approaches to compute maps for $L_2$.
 
-The trade-off in using full map or directional CFs is closely related to the information content of correlation
-functions \cite{Gommes1,Gommes2,skolnick2021}. Any reduction of the full map into ensemble averaged or
-directionally computed CFs significantly decreases the information available. On the other hand, full correlation map is
-larger than the image itself and, thus, storing such huge amount of data for already voluminous datasets is not practical.
-Vectorization of directional correlation functions is, thus, seems like a natural feature reduction approach while
-working with correlation maps. As applied to stochastic reconstructions, similar logic applies -
-it seems to be beneficial to increase the number of functions rather than their "volume". Full correlation maps
-are usually not available unless the structure is already known; but they may be useful in the form of 2D maps
-available from images for 3D reconstructions \cite{cherkasov2021}. Wether reconstructions of, say, full 3D maps
-based on 2D maps is a better approach than using directional CFs computed from images for stochastic reconstructions
-is an open question. Simulated annealing based methods were developed in the first place due to absence of
-methods like phase-recovery for correlation functions other than autocorrelation $S_2$. We believe that our fast and robust
-computational framework in the form of \code{CorrelationFunctions.jl} package will facilitate research in these directions.
+The trade-off in using full map or directional CFs is closely related to the
+information content of correlation functions
+\cite{Gommes1,Gommes2,skolnick2021}. Any reduction of the full map into ensemble
+averaged or directionally computed CFs significantly decreases the information
+available. On the other hand, full correlation map is larger than the image
+itself and, thus, storing such huge amount of data for already voluminous
+datasets is not practical.  Vectorization of directional correlation functions
+is, thus, seems like a natural feature reduction approach while working with
+correlation maps. As applied to stochastic reconstructions, similar logic
+applies - it seems to be beneficial to increase the number of functions rather
+than their "volume". Full correlation maps are usually not available unless the
+structure is already known; but they may be useful in the form of 2D maps
+available from images for 3D reconstructions \cite{cherkasov2021}. Wether
+reconstructions of, say, full 3D maps based on 2D maps is a better approach than
+using directional CFs computed from images for stochastic reconstructions is an
+open question. Simulated annealing based methods were developed in the first
+place due to absence of methods like phase-recovery for correlation functions
+other than autocorrelation $S_2$. We believe that our fast and robust
+computational framework in the form of \code{CorrelationFunctions.jl} package
+will facilitate research in these directions.
 
-While the toolbox of presented package and its API are solid, based on additional research numerous areas for future improvements of \code{CorrelationFunctions.jl}
-are possible:
+While the toolbox of presented package and its API are solid, based on
+additional research numerous areas for future improvements of
+\code{CorrelationFunctions.jl} are possible:
 \begin{enumerate}
-  \item include novel non-classical correlation functions, e.g., describing topology of phases;
-  \item implementing sub-cube based computations of CFs with a given correlation functions with later averaging for larger volume - 
-  with such domain decomposition one could compute CFs for larger samples with limited GPU resources;
-  \item implementing GPU-based clustering (cluster labeling) and distance-map transform to further speed up computations for $C_2$, chord-length and pore-size functions;
-  \item implementing higher order functions, such as 3-point probabilities or even 3-point cluster and other more involved CFs;
-  \item increase number of directions for scan approach or implementing calculations within a given solid angle.
+\item include novel non-classical correlation functions, e.g., describing
+  topology of phases;
+\item implementing sub-cube based computations of CFs with a given correlation
+  functions with later averaging for larger volume - with such domain
+  decomposition one could compute CFs for larger samples with limited GPU
+  resources;
+\item implementing GPU-based clustering (cluster labeling) and distance-map
+  transform to further speed up computations for $C_2$, chord-length and
+  pore-size functions;
+\item implementing higher order functions, such as 3-point probabilities or even
+  3-point cluster and other more involved CFs;
+\item increase number of directions for scan approach or implementing
+  calculations within a given solid angle.
 \end{enumerate}
-We perform steps forward in some directions, whilst others still require additional research to be made to facilitate their implementation
-within the package.
+We perform steps forward in some directions, whilst others still require
+additional research to be made to facilitate their implementation within the
+package.
 
 \section{Summary}
 \label{sec:summary}
-In this paper we introduced \code{CorrelationFunctions.jl} open-source package developed in Julia and capable of computing all classical
-correlation functions based on 2D and 3D input images. Our code is capable of evaluating two-point probability, cluster, lineal-path, surface-surface,
-surface-void, pore-size and chord-length functions on both CPU and GPU architectures. There possible, we presented two types of computations: full correlation map
-(correlations of each point with other pints on the image, that also allows obtaining ensemble averaged CF) and directional correlation functions
-(currently in major orthogonal and diagonal directions). Such an implementation allowed for the first time to assemble a completely free solution to
-evaluate correlation functions under any operating system with well documented API. Our package includes automatic tests against analytical solutions
-that are described in this paper. We measured wall times for all CPU and GPU implementations and as a rule of thumb full correlation maps on GPU are faster
-than directional scans using CPU due to the usage of fast Fourier transform. However, full maps require more RAM and, thus, are limited to available GPU RAM
-resources. On the other hand, directional CFs are memory efficient and can be evaluated for huge datasets - this way they are the first candidates for
-structural data compression of feature extraction. The package itself is available through Julia package ecosystem and on GitHub 
-(https://github.com/fatimp/CorrelationFunctions.jl), the latter source also contains documentation and additional helpful resources such as tutorials.
-We believe that a single powerful computational tool such as \code{CorrelationFunctions.jl} will significantly facilitate the usage of correlation
-functions in numerous areas of structural description and research, as well as in machine learning applications.
+In this paper we introduced \code{CorrelationFunctions.jl} open-source package
+developed in Julia and capable of computing all classical correlation functions
+based on 2D and 3D input images. Our code is capable of evaluating two-point
+probability, cluster, lineal-path, surface-surface, surface-void, pore-size and
+chord-length functions on both CPU and GPU architectures. There possible, we
+presented two types of computations: full correlation map (correlations of each
+point with other pints on the image, that also allows obtaining ensemble
+averaged CF) and directional correlation functions (currently in major
+orthogonal and diagonal directions). Such an implementation allowed for the
+first time to assemble a completely free solution to evaluate correlation
+functions under any operating system with well documented API. Our package
+includes automatic tests against analytical solutions that are described in this
+paper. We measured wall times for all CPU and GPU implementations and as a rule
+of thumb full correlation maps on GPU are faster than directional scans using
+CPU due to the usage of fast Fourier transform. However, full maps require more
+RAM and, thus, are limited to available GPU RAM resources. On the other hand,
+directional CFs are memory efficient and can be evaluated for huge datasets -
+this way they are the first candidates for structural data compression of
+feature extraction. The package itself is available through Julia package
+ecosystem and on GitHub (https://github.com/fatimp/CorrelationFunctions.jl), the
+latter source also contains documentation and additional helpful resources such
+as tutorials.  We believe that a single powerful computational tool such as
+\code{CorrelationFunctions.jl} will significantly facilitate the usage of
+correlation functions in numerous areas of structural description and research,
+as well as in machine learning applications.
 
 \section{Acknowledgments}
-This research was supported by the Russian Science Foundation grant
-19-72-10082.
+This research was supported by the Russian Science Foundation grant 19-72-10082.
 
 Collaborative effort of the authors within the FaT iMP (Flow and Transport in
 Media with Pores) research group (www.porenetwork.com) and used some of its
@@ -1133,8 +1217,8 @@ software.
 \section{Computation of number of trials for non-periodic mode}
 \label{sec:number-of-trials}
 Here we assume that an input is padded with zeros to the length $2s_i - 1$
-across each dimension $i$ where $s_i$ is the size of the non-padded input in that respective
-dimension. For each dimension we calculate a sequence:
+across each dimension $i$ where $s_i$ is the size of the non-padded input in
+that respective dimension. For each dimension we calculate a sequence:
 \begin{equation*}
   N^i_j = \left\{
   \begin{array}{cc}
