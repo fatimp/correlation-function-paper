@@ -71,15 +71,15 @@ to evaluate correlation functions under any operating system with well
 documented application programming interface (API). Our package includes
 automatic tests against analytical solutions that are described in the paper. We
 measured wall times for all CPU and GPU implementations and as a rule of thumb
-full correlation maps on GPU are faster than directional scans using CPU due to
-the usage of fast Fourier transform. However, full maps require more RAM and,
-thus, are limited to available GPU RAM resources. On the other hand, directional
-CFs are memory efficient and can be evaluated for huge datasets - this way they
-are the first candidates for structural data compression of feature
-extraction. The package itself is available through Julia package ecosystem and
-on GitHub (https://github.com/fatimp/CorrelationFunctions.jl), the latter source
-also contains documentation and additional helpful resources such as tutorials.
-We believe that a single powerful computational tool such as
+full correlation maps on GPU are faster than other methods. However, full maps
+require more RAM and, thus, are limited to available RAM resources. On the other
+hand, directional CFs are memory efficient and can be evaluated for huge
+datasets -- this way they are the first candidates for structural data
+compression of feature extraction. The package itself is available through Julia
+package ecosystem and on GitHub
+(https://github.com/fatimp/CorrelationFunctions.jl), the latter source also
+contains documentation and additional helpful resources such as tutorials.  We
+believe that a single powerful computational tool such as
 \code{CorrelationFunctions.jl} will significantly facilitate the usage of
 correlation functions in numerous areas of structural description and research,
 as well as in machine learning applications. We also present some example as
@@ -1194,7 +1194,7 @@ input array while, when calculating scans, FFT needs to be applied to each scan
 separately. Calculation on GPU shows performance increase when compared to CPU,
 as expected.  However, full maps require more RAM and, thus, are limited to
 available RAM resources. On the other hand, directional CFs are memory efficient
-and can be evaluated for huge datasets - this way they are the first candidates
+and can be evaluated for huge datasets -- this way they are the first candidates
 for structural data compression of feature extraction. The package itself is
 available through Julia package ecosystem and on GitHub
 (https://github.com/fatimp/CorrelationFunctions.jl), the latter source also
