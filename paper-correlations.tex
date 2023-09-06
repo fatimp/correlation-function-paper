@@ -357,9 +357,8 @@ directions in 3D case (three orthogonal, six diagonal within each orthogonal
 plane and four diagonal). All directions available are schematically represented
 in \cref{fig:directions}. The line segment scanning approach is slower for some
 CFs but requires much less memory resources. The full map approach establishes
-correlations between all points on the image is usually faster, as it leverages
-on Fast Fourier Transform computational speed.  Both implementations are
-contained in \code{Directional} and \code{Map} modules of the package,
+correlations between all points on the image and is faster. Both implementations
+are contained in \code{Directional} and \code{Map} modules of the package,
 correspondingly.
 
 With the help of the package one can compute CFs in periodic and non-periodic
@@ -427,16 +426,16 @@ that algorithmically operates as follows:
 \end{algorithmic}
 
 Cluster function can be calculated with the help of previuously described
-procedures.  Firstly, we apply an indicator function to an input $A$: $A^{(i)}
-\xleftarrow{I^{(i)}} A$. When we label connected components in $A^{(i)}$ using a
-function that is a part of Julia \code{ImageMorphology.jl} library.  Labeling
-algorithm must take into account if the function is calculated with periodic
-boundary conditions \cite{evstigneev2023}. For periodic boundary conditions we
-implemented our own solution as part of the package, as it is absent in the
-public domain. Then $C_2$ function is a sum of $S_2$ functions calculated for
-all clusters separately. Algorithmic complexity of this implementation is
-$O(MC\log M)$ where $M$ is the number of elements in the input and $C$ is the
-number of clusters. The algorithm is then written as:
+procedures.  Firstly, we apply an indicator function to an input $A$:
+$A^{(i)} \xleftarrow{I^{(i)}} A$. When we label connected components in
+$A^{(i)}$ using a function that is a part of Julia \code{ImageMorphology.jl}
+library.  Labeling algorithm must take into account if the function is
+calculated with periodic boundary conditions \cite{evstigneev2023}. For periodic
+boundary conditions we implemented our own solution as part of the package, as
+it is absent in the public domain. Then $C_2$ function is a sum of $S_2$
+functions calculated for all clusters separately. Algorithmic complexity of this
+implementation is $O(MC\log M)$ where $M$ is the number of elements in the input
+and $C$ is the number of clusters. The algorithm is then written as:
 \begin{algorithmic}[1]
   \Procedure{$C_2$}{$A, phase, periodic$}
   \State $A^{(phase)} \gets I^{(phase)} (A)$
@@ -454,26 +453,19 @@ all its coefficients with exception of the central coefficient are inversely
 proportional to distance from the center:
 \begin{equation}
   \begin{aligned}
-    H_{ij} &= S \left\{
-    \begin{array}{cc}
-      \frac{1}{\sqrt{(i-3)^2 + (j-3)^2}} & \quad i \ne 3, j \ne 3 \\
-      C & \quad \text{otherwise}
+    H_k &= S \left\{
+    \begin{array}{ll}
+      -\sum\limits_{\substack{l \\ l \ne 0}} E_l & \quad k = 0 \\
+      1 / \rho(k, 0) & \quad \text{otherwise}
     \end{array}
     \right. \\
-    H_{ijk} &= S \left\{
-    \begin{array}{cc}
-      \frac{1}{\sqrt{(i-3)^2 + (j-3)^2 + (k-3)^3}} & \quad i \ne 3, j \ne 3, k
-      \ne 3 \\
-      C & \quad \text{otherwise}
-    \end{array}
-    \right.
+    k &\in \{-3, -2, \dots, 3\}^D
   \end{aligned}
   \label{eq:filter-7x7}
 \end{equation}
-where $C$ is such that all coefficients of $H$ sum to zero, and $S$ equals to
-$30.45849$ in 2D and $172.96232$ in 3D case. The parameters of the filter were adjusted
-based on comparison against exact computations of surface functions on smooth-boundary
-sets \cite{postcov23}.
+where $S$ equals to $30.45849$ in 2D and $172.96232$ in 3D case. The parameters
+of the filter were adjusted based on comparison against exact computations of
+surface functions on smooth-boundary sets \cite{postcov23}.
 
 An algorithm for $F_{ss}$ function is the following:
 \begin{algorithmic}[1]
@@ -1196,15 +1188,18 @@ first time to assemble a completely free solution to evaluate correlation
 functions under any operating system with well documented API. Our package
 includes automatic tests against analytical solutions that are described in this
 paper. We measured wall times for all CPU and GPU implementations and as a rule
-of thumb full correlation maps on GPU are faster than directional scans using
-CPU due to the usage of fast Fourier transform. However, full maps require more
-RAM and, thus, are limited to available GPU RAM resources. On the other hand,
-directional CFs are memory efficient and can be evaluated for huge datasets -
-this way they are the first candidates for structural data compression of
-feature extraction. The package itself is available through Julia package
-ecosystem and on GitHub (https://github.com/fatimp/CorrelationFunctions.jl), the
-latter source also contains documentation and additional helpful resources such
-as tutorials.  We believe that a single powerful computational tool such as
+of thumb full correlation maps are faster than directional scans because
+calculation of correlation maps applies fast Fourier transform to the whole
+input array while, when calculating scans, FFT needs to be applied to each scan
+separately. Calculation on GPU shows performance increase when compared to CPU,
+as expected.  However, full maps require more RAM and, thus, are limited to
+available RAM resources. On the other hand, directional CFs are memory efficient
+and can be evaluated for huge datasets - this way they are the first candidates
+for structural data compression of feature extraction. The package itself is
+available through Julia package ecosystem and on GitHub
+(https://github.com/fatimp/CorrelationFunctions.jl), the latter source also
+contains documentation and additional helpful resources such as tutorials.  We
+believe that a single powerful computational tool such as
 \code{CorrelationFunctions.jl} will significantly facilitate the usage of
 correlation functions in numerous areas of structural description and research,
 as well as in machine learning applications.
