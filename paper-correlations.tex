@@ -62,8 +62,8 @@ based on imaging input data. Images include both binary and multi-phase
 representations.  Our code is capable of evaluating two-point probability $S_2$,
 cluster $C_2$, lineal-path $L_2$, surface-surface $F_{ss}$, surface-void
 $F_{sv}$, pore-size $P$ and chord-length $p$ functions on both CPU and GPU
-architectures.  W\here possible, we presented two types of computations: full
-correlation map (correlations of each point with other pints on the image, that
+architectures.  Where possible, we presented two types of computations: full
+correlation map (correlations of each point with other points on the image, that
 also allows obtaining ensemble averaged CF) and directional correlation
 functions (currently in major orthogonal and diagonal directions).  Such an
 implementation allowed for the first time to assemble a completely free solution
@@ -133,24 +133,24 @@ physics \cite{ledesma2018effect}, soil physics and hydrology
 \cite{TakadaJain,Derossi2019}, biology \cite{veatch2012correlation} and many
 others. Computed from 2D and 3D images, CFs can be applied to:
 \begin{enumerate}
-  \item to characterize the morphology and representativeness via correlation
-    lengths \cite{vcapek2009stochastic,thovert2011grain,tensorPRE};
-  \item to perform stochastic reconstructions from experimentally measured CFs
-    or 2D to 3D reconstructions based on CFs that can be extracted from less
-    dimensions or through penetrable sphere model
-    \cite{Adler_recon,Y-T,tahmasebiPRL,hasanabadi20163d,karsaninaPRL};
-  \item compare different structures to each other, including verification of
-    stochastic reconstructions \cite{vcapek2009stochastic,tahmasebiPRL,EPL2};
-  \item compress structural information in the form of raw or parameterized CFs
-    with the possibility to recover the structure using stochastic
-    reconstruction \cite{SciRep1,Havelka,KarsaninaEJSS};
-  \item describe structural dynamics under different boundary conditions
-    \cite{chen2015dynamic,xu2022correlation,fomin2023soil};
-  \item extract structural features for deep learning
-    \cite{pilania2017multi,kamrava2020linking,roding2020predicting,KarsaninaEJSS};
-  \item fuse multi-scale images and structural information as obtained by
-    different methods into a single digital model \cite{Geoderma2018};
-  \item quantify spatial heterogeneity \cite{zhang2000pore,REVpaper}.
+\item characterize the morphology and representativeness via correlation
+  lengths \cite{vcapek2009stochastic,thovert2011grain,tensorPRE};
+\item perform stochastic reconstructions from experimentally measured CFs
+  or 2D to 3D reconstructions based on CFs that can be extracted from less
+  dimensions or through penetrable sphere model
+  \cite{Adler_recon,Y-T,tahmasebiPRL,hasanabadi20163d,karsaninaPRL};
+\item compare different structures to each other, including verification of
+  stochastic reconstructions \cite{vcapek2009stochastic,tahmasebiPRL,EPL2};
+\item compress structural information in the form of raw or parameterized CFs
+  with the possibility to recover the structure using stochastic
+  reconstruction \cite{SciRep1,Havelka,KarsaninaEJSS};
+\item describe structural dynamics under different boundary conditions
+  \cite{chen2015dynamic,xu2022correlation,fomin2023soil};
+\item extract structural features for deep learning
+  \cite{pilania2017multi,kamrava2020linking,roding2020predicting,KarsaninaEJSS};
+\item fuse multi-scale images and structural information as obtained by
+  different methods into a single digital model \cite{Geoderma2018};
+\item quantify spatial heterogeneity \cite{zhang2000pore,REVpaper}.
 \end{enumerate}
 
 Stochastic reconstruction is a separate huge topic, as this approach allows to
