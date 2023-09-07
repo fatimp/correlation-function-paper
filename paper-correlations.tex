@@ -373,7 +373,7 @@ the whole Euclidean space. Non-periodic mode treats the input as zero-padded ima
 \label{sec:map}
 Definition \cref{eq:s2-def} can be rewritten as follows:
 \begin{equation}
-  S_2^{(i)}(r) = \frac{F^{-1} [|F [A^{(i)}](z)|] (r)}{N(r)} \label{eq:s2-ft}
+  S_2^{(i)}(r) = \frac{F^{-1} [|F [A^{(i)}](z)|^2] (r)}{N(r)} \label{eq:s2-ft}
 \end{equation}
 where $A^{(i)} \xleftarrow{I^{(i)}} A$ is a binary array obtained by element-wise
 application of interface indicator $I^{(i)}$ to an input $A$, $F$ is a discrete
@@ -393,7 +393,7 @@ non-periodic mode $N(r)$ is calculated as described in
   \EndIf
   \State $A^{(phase)} \gets I^{(phase)} (A)$
   \State $\hat{A}^{(phase)} \gets F[A^{(phase)}]$
-  \State $\hat{S}_2 \gets |\hat{A}^{(phase)}| / N$
+  \State $\hat{S}_2 \gets |\hat{A}^{(phase)}|^2 / N$
   \Comment $N$ is an array with numbers of trials
   \State \textbf{return} $F^{-1} [\hat{S}_2]$
   \EndProcedure
@@ -472,7 +472,7 @@ An algorithm for $F_{ss}$ function is the following:
   \State $A^{(phase)} \gets I^{(phase)} (A)$
   \State $A_H \gets H * A^{(phase)}$
   \State $\hat{A}_H \gets F[A_H]$
-  \State $\hat{F}_{ss} \gets |\hat{A}_H| / N$
+  \State $\hat{F}_{ss} \gets |\hat{A}_H|^2 / N$
   \State \textbf{return} $F^{-1} [\hat{F}_{ss}]$
   \EndProcedure
 \end{algorithmic}
