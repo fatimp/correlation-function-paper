@@ -62,7 +62,7 @@ based on imaging input data. Images include both binary and multi-phase
 representations.  Our code is capable of evaluating two-point probability $S_2$,
 cluster $C_2$, lineal-path $L_2$, surface-surface $F_{ss}$, surface-void
 $F_{sv}$, pore-size $P$ and chord-length $p$ functions on both CPU and GPU
-architectures.  There possible, we presented two types of computations: full
+architectures.  W\here possible, we presented two types of computations: full
 correlation map (correlations of each point with other pints on the image, that
 also allows obtaining ensemble averaged CF) and directional correlation
 functions (currently in major orthogonal and diagonal directions).  Such an
@@ -455,7 +455,7 @@ proportional to distance from the center:
   \begin{aligned}
     H_k &= S \left\{
     \begin{array}{ll}
-      -\sum\limits_{\substack{l \\ l \ne 0}} E_l & \quad k = 0 \\
+      -\sum\limits_{\substack{l \\ l \ne 0}} H_l & \quad k = 0 \\
       1 / \rho(k, 0) & \quad \text{otherwise}
     \end{array}
     \right. \\
@@ -512,7 +512,7 @@ where $\hat{f_0}$ is a Fourier transform of $f_0$ and $\omega$ is a folding
 frequency which depends only on resolution of the image. We have previously
 shown that criterion $C_{0.5} > 0.97$ holds then the image is suitable for
 robust $F_{ss}$ and $F_{sv}$ evaluation \cite{samarin2023robust}.  Note that
-function \code{lowfreq\_energy\_ratio} that computes $C_{0.5}$ criterion for any
+function \code{lowfreq\_energy\_ratio} that computes $C_{0.5}$ parameter for any
 input binary image is the part of \code{CorrelationFunctions.jl} package.
 
 Our library does not have an implementation for lineal-path and chord-length
@@ -1181,7 +1181,7 @@ based on 2D and 3D input images. Our code is capable of evaluating two-point
 probability, cluster, lineal-path, surface-surface, surface-void, pore-size and
 chord-length functions on both CPU and GPU architectures. There possible, we
 presented two types of computations: full correlation map (correlations of each
-point with other pints on the image, that also allows obtaining ensemble
+point with other points on the image, that also allows obtaining ensemble
 averaged CF) and directional correlation functions (currently in major
 orthogonal and diagonal directions). Such an implementation allowed for the
 first time to assemble a completely free solution to evaluate correlation
@@ -1197,7 +1197,7 @@ available RAM resources. On the other hand, directional CFs are memory efficient
 and can be evaluated for huge datasets -- this way they are the first candidates
 for structural data compression of feature extraction. The package itself is
 available through Julia package ecosystem and on GitHub
-(https://github.com/fatimp/CorrelationFunctions.jl), the latter source also
+(\url{https://github.com/fatimp/CorrelationFunctions.jl}), the latter source also
 contains documentation and additional helpful resources such as tutorials.  We
 believe that a single powerful computational tool such as
 \code{CorrelationFunctions.jl} will significantly facilitate the usage of
