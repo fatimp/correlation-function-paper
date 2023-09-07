@@ -495,7 +495,7 @@ Using \cref{eq:cross-ft} we obtain an algorithm for surface-void function:
 
 The interface between phases must not change rapidly for the edge filter to
 work correctly. Therefore, the algorithms for surface functions require input
-images to be with an apropriate resolution. A criterion for goodness can be expressed with
+images to have apropriate resolution. A criterion for goodness can be expressed with
 $C_{\alpha}$ parameter. Let $\alpha \in [0, 1]$ and $f(x)$ be
 (band-limited) input image ($x \in \mathbb{R}^2$ or $\mathbb{R}^3$). We define
 $C_\alpha$ as follows:
@@ -623,7 +623,7 @@ preferred to $O(MC \log M)$ full map algorithm. Such an approach is present belo
         \EndIf
         \For{$j = i, end$}
           \If{$slice[i] = slice[j \mod len] \ne 0$}
-            \Comment $0$ is a label for background (phase not equal to $phase$).
+            \Comment $0$ is a label for background.
             \State $dst \gets |(j \mod len) - i|$
             \State $result[dst] \gets result[dst] + 1$
           \EndIf
@@ -674,6 +674,7 @@ length in per-slice manner. Finally, chord lengths can be binned to a histogram.
           \Comment We are not in the phase of interest
           \State $maybe\_chord \gets False$
         \EndIf
+        \State $l \gets l+1$
       \EndFor
     \EndFor
     \State \textbf{return} $chord\_list$ or $histogram(chord\_list)$
