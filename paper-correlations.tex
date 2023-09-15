@@ -388,7 +388,7 @@ non-periodic mode we need to pad an input with zeros to at least twice the size
 minus one for each dimension. In periodic mode a total number of trials is
 independent of $r$ and equals to the number of elements in an input array. In
 non-periodic mode $N(r)$ is calculated as described in
-\cref{sec:number-of-trials}. The following algorithm summarizes all the above:
+\ref{sec:number-of-trials}. The following algorithm summarizes all the above:
 \begin{algorithmic}[1]
   \Procedure{$S_2$}{$A, phase, periodic$}
   \If{$\neg periodic$}
@@ -573,7 +573,7 @@ of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
       \EndIf
     \EndIf
     \State \textbf{return} $success$ divided by number of trials
-    (see \cref{sec:number-of-trials})
+    (see \ref{sec:number-of-trials})
   \EndProcedure
   \\
   \Procedure{countruns}{$A, phase$}
