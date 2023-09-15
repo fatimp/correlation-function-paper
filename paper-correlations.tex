@@ -25,8 +25,6 @@
 
 \definecolor{light-gray}{gray}{0.95}
 \newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
-% When cleveref fails to do its job
-\newcommand{\apref}[1]{Appendix \ref{#1}}
 
 \bibliographystyle{elsarticle-num}
 \journal{Computational Material Science}
@@ -55,13 +53,14 @@ Dolgoprudny, Moscow, Russia 141700}
 
 \begin{abstract}
 Correlation functions are becoming one of the major tools for quantification of
-structural information that is usually represented as material's 2D or 3D image.
-In this paper we introduce \code{CorrelationFunctions.jl} open-source package
-developed in Julia and capable of computing all classical correlation functions
-based on imaging input data. Images include both binary and multi-phase
-representations.  Our code is capable of evaluating two-point probability $S_2$,
-cluster $C_2$, lineal-path $L_2$, surface-surface $F_{ss}$, surface-void
-$F_{sv}$, pore-size $P$ and chord-length $p$ functions on both CPU and GPU
+structural information that is usually represented as 2D or 3D image of porous
+material.  In this paper we introduce \code{CorrelationFunctions.jl} open-source
+package developed in Julia and capable of computing all classical correlation
+functions based on imaging input data. Images include both binary and
+multi-phase representations.  Our code is capable of evaluating two-point
+probability $S_2$, phase cross-correlation $\rho_{ij}$, cluster $C_2$,
+lineal-path $L_2$, surface-surface $F_{ss}$, surface-void $F_{sv}$, pore-size
+$P$ and chord-length $p$ distribution functions on both CPU and GPU
 architectures.  Where possible, we presented two types of computations: full
 correlation map (correlations of each point with other points on the image, that
 also allows obtaining ensemble averaged CF) and directional correlation
@@ -70,31 +69,31 @@ implementation allowed for the first time to assemble a completely free solution
 to evaluate correlation functions under any operating system with well
 documented application programming interface (API). Our package includes
 automatic tests against analytical solutions that are described in the paper. We
-measured wall times for all CPU and GPU implementations and as a rule of thumb
-full correlation maps on GPU are faster than other methods. However, full maps
-require more RAM and, thus, are limited to available RAM resources. On the other
-hand, directional CFs are memory efficient and can be evaluated for huge
+measured execution times for all CPU and GPU implementations and as a rule of
+thumb full correlation maps on GPU are faster than other methods. However, full
+maps require more RAM and, thus, are limited to available RAM resources. On the
+other hand, directional CFs are memory efficient and can be evaluated for huge
 datasets -- this way they are the first candidates for structural data
 compression of feature extraction. The package itself is available through Julia
 package ecosystem and on GitHub
 (\url{https://github.com/fatimp/CorrelationFunctions.jl}), the latter source
 also contains documentation and additional helpful resources such as tutorials.
 We believe that a single powerful computational tool such as
-\code{CorrelationFunctions.jl} will significantly facilitate the usage of
-correlation functions in numerous areas of structural description and research,
-as well as in machine learning applications. We also present some example as
-applied to ceramic, soil composite and oil-bearing rock samples based on their
-3D X-ray tomography and 2D scanning electron microscope images. Finally, we
-conclude our paper with discussion of possible ways to further improve presented
-computational framework.
+\code{CorrelationFunctions.jl} presented in this paper will significantly
+facilitate the usage of correlation functions in numerous areas of structural
+description and research of porous materials, as well as in machine learning
+applications. We also present some example as applied to ceramic, soil composite
+and oil-bearing rock samples based on their 3D X-ray tomography and 2D scanning
+electron microscope images. Finally, we conclude our paper with discussion of
+possible ways to further improve presented computational framework.
 \end{abstract}
 
 \maketitle
 
 \section{Background and motivation}
 \label{sec:background}
-Materials are ubiquitous both in nature and in industrial human activities, and
-their physical properties are interconnected to structure
+Heterogeneous materials are ubiquitous both in nature and in industrial human
+activities, and their physical properties are interconnected to structure
 \cite{Torquato_book,Sahimi_book}. The information about the structure usually
 comes in the way of 2D and 3D images obtained by microscopy
 \cite{moussaoui2018,neumann2019,FIB-SEMpaper}, tomography \cite{xctmat_book} and
@@ -206,7 +205,7 @@ While evaluation of correlation functions from 2D and 3D images was a topic of
 numerous research papers, the information is highly fragmented, especially in
 terms of algorithms and their implementation in the code. Some snippets of code
 are available for some functions, but they lack general API and are usually
-implemented in proprietary interpreted languages such as Matlab. Due to a recent
+implemented in proprietary interpreted languages (e.g. Matlab). Due to a recent
 leap forward in GPU-based computations, some papers describe computations on
 this architecture, but the code is usually not provided. All in all, the
 efficient and open-source single API solution utilizing both CPU and GPU
@@ -223,19 +222,21 @@ introduce a reader to the most common and useful correlation functions,
 \cref{sec:map} presents all algorithmic details for computing full CFs maps (map
 method, full 2-point statistics for a given image). In \cref{sec:scan} we
 discuss the second method to calculate correlation functions which is called the
-scan approach. In \cref{sec:verification} we verify the all computations based on
-known analytical solutions. \cref{sec:efficiency} deals with computational
-efficiency of our code, we compare computational times for 2D and 3D images of
-different sizes for scanning and map methods as evaluated using either CPU or
-GPU. In \cref{sec:examples} some application examples are provided, including
-CFs evaluation for multi-phase materials. Finally, \cref{sec:summary} summarizes
-all results and outlines possible future improvements.
+scan approach. In \cref{sec:verification} we verify our algorithms based on
+known analytical solutions. In \cref{sec:examples} some application examples are
+provided, including CFs evaluation for multi-phase materials. Section
+\ref{sec:efficiency} deals with computational efficiency of our code, we compare
+computational times for 2D and 3D images of different sizes for scanning and map
+methods as evaluated using either CPU or GPU.  Finally, sections
+\ref{sec:outlook} and \ref{sec:summary} summarize all results and outline
+possible future improvements.
 
 \section{A brief primer on correlation functions}
 \label{sec:math}
-In this section we shall provide major properties of correlation functions
-supported by our package; the full list of functions is 
-(see \cref{fig:functions} for graphical explanation in addition to definitions below):
+In this section we shall provide major properties and definitions of correlation
+functions supported by our package; the full list of functions is (see
+\cref{fig:functions} for graphical explanation in addition to definitions
+below):
 \begin{itemize}
 \item Two-point probability function $S_2$,
 \item Lineal-path function $L_2$,
@@ -278,9 +279,10 @@ $\rho_{ij}$ which is defined as follows:
   \label{eq:cross-def}
 \end{equation}
 
-Another basic correlation function is a lineal path function. It provides some
-non-trivial information (albeit usually not complete \cite{vcapek2011transport})
-about the connectedness of the phase and is defined for homogenous media as:
+Another basic correlation function is a lineal path function $L_2$. It provides
+some non-trivial information (albeit usually not complete
+\cite{vcapek2011transport}) about the connectedness of the phase and is defined
+for homogenous media as:
 \begin{definition}
   Lineal path function $L_2^{(i)}(\bm{r})$ equals to probability that a
   vector $\bm{r}$ lies wholly in phase $i$ when randomly thrown into the
@@ -307,8 +309,9 @@ Note that for a fully connected phase $C_2$ will be equal to $S_2$, something
 we shall utilize later for computations.
 
 The next two functions are called surface-surface ($F_{ss}$) and surface-void
-($F_{sv}$) functions and describe an interphase between phases. We skip strict verbal
-definitions and first introduce an interface indicator function instead:
+($F_{sv}$) correlation functions and describe an interphase between phases. We
+skip strict verbal definitions and first introduce an interface indicator
+function instead:
 \begin{equation*}
   M^{(i)}(\bm{r}) = | \nabla I^{(i)}(\bm{r}) |
 \end{equation*}
@@ -326,22 +329,22 @@ higher. $F_{sv}$ is a physical quantity inversely proportional to length and
 $F_{ss}$ is inversionaly proportional to surface area. As always, there are
 versions of these functions applicable to scalar argument for isotropic media.
 
-Pore size function $P(\delta)$ is a probability density function defined as
-follows:
+Pore size function $P(r)$ is a probability density function defined as follows:
 \begin{definition}
-  $P(\delta)d\delta$ = Probability that a randomly chosen point in a set of points
-  belonging to the void phase lies at a distance between $\delta$ and $\delta + d\delta$
+  $P(r)dr$ equals to the probability that a randomly chosen point in a set of
+  points belonging to the void phase lies at a distance between $r$ and $r + dr$
   from the nearest point on the pore-solid interface.
 \end{definition}
 
 Finally, a chord length function $p^{(i)}(r)$ is defined as:
 \begin{definition}
-$p^{(i)}(r)dz$ = Probability of finding a chord of length between $r$ and $r+dr$
-in phase $i$. Chord is a line segment which lies entirely in the same phase and
-touches the interface with its ends.
+  $p^{(i)}(r)dr$ equals to the probability of finding a chord of length between
+  $r$ and $r+dr$ in phase $i$. Chord is a line segment which lies entirely in
+  the same phase and touches the interface with its ends.
 \end{definition}
 
-More detailed information on all classical CFs can be found in \cite{Torquato_book}.
+More detailed information on all classical CFs can be found in
+\cite{Torquato_book}.
 
 \section{Computational methodology}
 \code{CorrelationFunctions.jl} is capable to compute all aforementioned
@@ -377,7 +380,7 @@ Definition \cref{eq:s2-def} can be rewritten as follows:
   S_2^{(i)}(r) = \frac{F^{-1} [|F [A^{(i)}](z)|^2] (r)}{N(r)} \label{eq:s2-ft}
 \end{equation}
 where $A^{(i)} \xleftarrow{I^{(i)}} A$ is a binary array obtained by element-wise
-application of interface indicator $I^{(i)}$ to an input $A$, $F$ is a discrete
+application of indicator function $I^{(i)}$ to an input $A$, $F$ is a discrete
 Fourier transform (DFT) operator and $N(r)$ is a total number of trials (vectors
 thrown into the sample). If we want to calculate $S_2$ function in periodic mode
 we need only to apply \cref{eq:s2-ft} to an input to obtain the result. In
@@ -424,15 +427,15 @@ that algorithmically operates as follows:
 
 Cluster function can be calculated with the help of previuously described
 procedures.  Firstly, we apply an indicator function to an input $A$:
-$A^{(i)} \xleftarrow{I^{(i)}} A$. When we label connected components in
-$A^{(i)}$ using a function that is a part of Julia \code{ImageMorphology.jl}
-library.  Labeling algorithm must take into account if the function is
-calculated with periodic boundary conditions \cite{evstigneev2023}. For periodic
-boundary conditions we implemented our own solution as part of the package, as
-it is absent in the public domain. Then $C_2$ function is a sum of $S_2$
-functions calculated for all clusters separately. Algorithmic complexity of this
-implementation is $O(MC\log M)$ where $M$ is the number of elements in the input
-and $C$ is the number of clusters. The algorithm is then written as:
+$A^{(i)} \xleftarrow{I^{(i)}} A$. Then we label clusters in $A^{(i)}$ using a
+function that is a part of Julia \code{ImageMorphology.jl} library.  Labeling
+algorithm must take into account if the function is calculated with periodic
+boundary conditions \cite{evstigneev2023}. For periodic boundary conditions we
+implemented our own solution as part of the package, as it is absent in the
+public domain. Then $C_2$ function is a sum of $S_2$ functions calculated for
+all clusters separately. Algorithmic complexity of this implementation is
+$O(MC\log M)$ where $M$ is the number of elements in the input and $C$ is the
+number of clusters. The algorithm is then written as:
 \begin{algorithmic}[1]
   \Procedure{$C_2$}{$A, phase, periodic$}
   \State $A^{(phase)} \gets I^{(phase)} (A)$
@@ -445,9 +448,9 @@ and $C$ is the number of clusters. The algorithm is then written as:
 For surface-surface and surface-void functions we use an edge detection filter
 \cite{samarin2023robust} and then calculate either autocorrelation of the edge
 or cross-correlation of the edge and the void phase. The edge is extracted by
-convolving an input with a short high-pass filter $H$. It has a width $7$ and
-all its coefficients with exception of the central coefficient are inversely
-proportional to distance from the center:
+convolving an input with a short high-pass filter $H$. It has a width of 7
+pixels/voxels and all its coefficients with exception of the central coefficient
+are inversely proportional to distance from the center:
 \begin{equation}
   \begin{aligned}
     H_k &= S \left\{
@@ -523,7 +526,7 @@ $L_2$.
 Majority of described algorithms contain parallelizable operations such as fast
 Fourier transform, connected components labeling and image filtering, hence they
 are perfectly suited for execution on GPUs and provide very fast computations
-(see wall times below).
+(see execution times below).
 
 \subsection{Directional scanning with line segment}
 \label{sec:scan}
@@ -554,7 +557,7 @@ void, solid or some other phase, and $periodic$ is a boolean value which equals
 to true if we compute $L_2$ in periodic mode and false otherwise. The efficiency
 of the proposed algorithm is $O(n)$ where $n$ is the length of the array.
 \begin{algorithmic}[1]
-  \Procedure{l2}{$A, phase, periodic$}
+  \Procedure{$L_2$}{$A, phase, periodic$}
     \State $len \gets length(A)$
     \State $result \gets zeros(len)$
     \State $runs \gets countruns(A, phase)$
@@ -611,7 +614,7 @@ Cluster function can be calculated using the same technique as in map approach,
 but if the number of clusters is high, a naïve $O(n^2)$ algorithm may be
 preferred to $O(MC \log M)$ full map algorithm. Such an approach is present below:
 \begin{algorithmic}[1]
-  \Procedure{c2}{$A, phase, periodic$}
+  \Procedure{$C_2$}{$A, phase, periodic$}
     \State $A' \gets I^{(phase)}(A)$
     \State $CC \gets label\_components(A', periodic)$
     \State $len \gets length(A)$
@@ -646,10 +649,11 @@ distance transform function defined as follows:
   \end{array}
 \right. \label{eq:distance-transform}
 \end{equation}
-There are many algorithms for distance transform, including algorithms performed
-in linear time \cite{DT}.In \code{chord\_length} function we firstly apply
-distance transform to an input to find the interface and then accumulate chord
-length in per-slice manner. Finally, chord lengths can be binned to a histogram.
+where $\rho$ is the Euclidean distance between two points. There are many
+algorithms for distance transform, including algorithms performed in linear time
+\cite{DT}.In \code{chord\_length} function we firstly apply distance transform
+to an input to find the interface and then accumulate chord length in per-slice
+manner. Finally, chord lengths can be binned to a histogram.
 \begin{algorithmic}[1]
   \Procedure{chord\_length}{$A, phase$}
     \State $A' \gets I^{(phase)}(A)$
@@ -1105,6 +1109,7 @@ slowest among other implementations, but require less memory.
 \end{figure*}
 
 \section{Discussion and outlook}
+\label{sec:outlook}
 In the light of the end of the previous section it is important to clarify that
 available (video) RAM or speed of computations are not the only considerations
 behind choosing between full correlation map and directional linear
@@ -1173,28 +1178,29 @@ package.
 In this paper we introduced \code{CorrelationFunctions.jl} open-source package
 developed in Julia and capable of computing all classical correlation functions
 based on 2D and 3D input images. Our code is capable of evaluating two-point
-probability, cluster, lineal-path, surface-surface, surface-void, pore-size and
-chord-length functions on both CPU and GPU architectures. There possible, we
-presented two types of computations: full correlation map (correlations of each
-point with other points on the image, that also allows obtaining ensemble
-averaged CF) and directional correlation functions (currently in major
-orthogonal and diagonal directions). Such an implementation allowed for the
-first time to assemble a completely free solution to evaluate correlation
-functions under any operating system with well documented API. Our package
-includes automatic tests against analytical solutions that are described in this
-paper. We measured wall times for all CPU and GPU implementations and as a rule
-of thumb full correlation maps are faster than directional scans because
-calculation of correlation maps applies fast Fourier transform to the whole
-input array while, when calculating scans, FFT needs to be applied to each scan
-separately. Calculation on GPU shows performance increase when compared to CPU,
-as expected.  However, full maps require more RAM and, thus, are limited to
-available RAM resources. On the other hand, directional CFs are memory efficient
-and can be evaluated for huge datasets -- this way they are the first candidates
-for structural data compression of feature extraction. The package itself is
-available through Julia package ecosystem and on GitHub
-(\url{https://github.com/fatimp/CorrelationFunctions.jl}), the latter source also
-contains documentation and additional helpful resources such as tutorials.  We
-believe that a single powerful computational tool such as
+probability, cross-correlation, cluster, lineal-path, surface-surface,
+surface-void, pore-size and chord-length functions on both CPU and GPU
+architectures. There possible, we presented two types of computations: full
+correlation map (correlations of each point with other points on the image, that
+also allows obtaining ensemble averaged CF) and directional correlation
+functions (currently in major orthogonal and diagonal directions). Such an
+implementation allowed for the first time to assemble a completely free solution
+to evaluate correlation functions under any operating system with well
+documented API. Our package includes automatic tests against analytical
+solutions that are described in this paper. We measured execution times for all
+CPU and GPU implementations and as a rule of thumb full correlation maps are
+faster than directional scans because calculation of correlation maps applies
+fast Fourier transform to the whole input array while, when calculating scans,
+FFT needs to be applied to each scan separately. Calculation on GPU shows
+performance increase when compared to CPU, as expected.  However, full maps
+require more RAM and, thus, are limited to available RAM resources. On the other
+hand, directional CFs are memory efficient and can be evaluated for huge
+datasets -- this way they are the first candidates for structural data
+compression of feature extraction. The package itself is available through Julia
+package ecosystem and on GitHub
+(\url{https://github.com/fatimp/CorrelationFunctions.jl}), the latter source
+also contains documentation and additional helpful resources such as tutorials.
+We believe that a single powerful computational tool such as
 \code{CorrelationFunctions.jl} will significantly facilitate the usage of
 correlation functions in numerous areas of structural description and research,
 as well as in machine learning applications.
