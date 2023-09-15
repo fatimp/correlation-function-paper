@@ -428,20 +428,21 @@ that algorithmically operates as follows:
 Cluster function can be calculated with the help of previuously described
 procedures.  Firstly, we apply an indicator function to an input $A$:
 $A^{(i)} \xleftarrow{I^{(i)}} A$. Then we label clusters in $A^{(i)}$ using a
-function that is a part of Julia \code{ImageMorphology.jl} library.  Labeling
-algorithm must take into account if the function is calculated with periodic
-boundary conditions \cite{evstigneev2023}. For periodic boundary conditions we
-implemented our own solution as part of the package, as it is absent in the
-public domain. Then $C_2$ function is a sum of $S_2$ functions calculated for
-all clusters separately. Algorithmic complexity of this implementation is
-$O(MC\log M)$ where $M$ is the number of elements in the input and $C$ is the
-number of clusters. The algorithm is then written as:
+function \code{label\_components} which is a part of Julia
+\code{ImageMorphology.jl} library.  Labeling algorithm must take into account if
+the function is calculated with periodic boundary conditions
+\cite{evstigneev2023}. For periodic boundary conditions we implemented our own
+solution as part of the package, as it is absent in the public domain. Then
+$C_2$ function is a sum of $S_2$ functions calculated for all clusters
+separately. Algorithmic complexity of this implementation is $O(MC\log M)$ where
+$M$ is the number of elements in the input and $C$ is the number of
+clusters. The algorithm is then written as:
 \begin{algorithmic}[1]
   \Procedure{$C_2$}{$A, phase, periodic$}
   \State $A^{(phase)} \gets I^{(phase)} (A)$
-  \State $CC \gets label\_components(A^{(phase)}, periodic)$
-  \State $N \gets maximum(CC)$ \Comment Number of connected components
-  \State \textbf{return} $\sum\limits_{n=1}^N S_2(CC, n, periodic)$
+  \State $Labels \gets label\_components(A^{(phase)}, periodic)$
+  \State $N \gets maximum(Labels)$ \Comment Number of clusters
+  \State \textbf{return} $\sum\limits_{n=1}^N S_2(Labels, n, periodic)$
   \EndProcedure
 \end{algorithmic}
 
@@ -524,9 +525,9 @@ evaluation). Moreover, linear scan approach is orders of magnitude faster for
 $L_2$.
 
 Majority of described algorithms contain parallelizable operations such as fast
-Fourier transform, connected components labeling and image filtering, hence they
-are perfectly suited for execution on GPUs and provide very fast computations
-(see execution times below).
+Fourier transform, cluster labeling and image filtering, hence they are
+perfectly suited for execution on GPUs and provide very fast computations (see
+execution times below).
 
 \subsection{Directional scanning with line segment}
 \label{sec:scan}
@@ -548,8 +549,8 @@ direction $\bm{d}$, $F^{\bm{d}}_i(r)$ is a ``partial'' correlation
 function calculated for a $i$-th slice and $N_i(r)$ is a total number of trials
 for a correlation length $r$ and slice $i$. Some algorithms require
 preprocessing stages before cutting the input in slices, e.g., image filtering
-for edge detection or connected components labeling performed on the whole
-array, not on slices.
+for edge detection or cluster labeling performed on the whole array, not on
+slices.
 
 An algorithm for computation of linear-path function for one-dimensional slice
 is presented below. Here $A$ is a one-dimensional input array, $phase$ can be
@@ -1069,9 +1070,9 @@ along major axial directions only.
 
 Functions which calculate full correlation maps are suitable for running on both
 CPU and GPU, so we provide execution times for both. The cluster function uses
-an algorithm for closest component labeling which has CPU-only implementation
-(thus, leaving a room for future improvements). Directional computations are
-performed exclusively on CPUs.
+an algorithm for cluster labeling which has CPU-only implementation (thus,
+leaving a room for future improvements). Directional computations are performed
+exclusively on CPUs.
 
 All measurements of execution time are presented on \cref{fig:timings}. It is
 immediately apparent that GPU versions (where available) are much faster than
@@ -1161,7 +1162,7 @@ additional research numerous areas for future improvements of
   functions with later averaging for larger volume - with such domain
   decomposition one could compute CFs for larger samples with limited GPU
   resources;
-\item implementing GPU-based clustering (cluster labeling) and distance-map
+\item implementing GPU-based clustering (cluster labeling) and distance
   transform to further speed up computations for $C_2$, chord-length and
   pore-size functions;
 \item implementing higher order functions, such as 3-point probabilities or even
