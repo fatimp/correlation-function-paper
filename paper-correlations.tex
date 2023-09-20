@@ -26,69 +26,97 @@
 \definecolor{light-gray}{gray}{0.95}
 \newcommand{\code}[1]{\colorbox{light-gray}{\texttt{#1}}}
 
-\bibliographystyle{elsarticle-num}
-\journal{Computational Material Science}
+\journal{Computer Physics Communications}
 
 \begin{document}
 
-\author[Smith]{Vasily~Postnicov}
-\author[Smith,MIT]{Aleksei~Samarin}
-\author[Smith]{Marina ~V. Karsanina}
-\author[Aus]{Mathieu ~Gravey}
-\author[MIPT]{Aleksey~Khlyupin}
-\author[Smith]{Kirill ~M. Gerke}
-\ead{kg@ifz.ru}
+\begin{frontmatter}
+  \title{Evaluation of classical correlation functions from 2/3D images on CPU and
+    GPU architectures: introducing CorrelationFunctions.jl}
 
-\address[Smith]{Schmidt Institute of Physics of the Earth of Russian Academy of
-  Sciences, Moscow, 107031, Russia}
-\address[MIT]{Computational Mathematics and Cybernetics, Lomonosov Moscow State
-  University, Moscow, 119991, Russia}
-\address[Aus]{Institute for Interdisciplinary Mountain Research, Austrian
-  Academy of Sciences, Innsbruck, 6020, Austria}
-\address[MIPT]{Moscow Institute of Physics and Technology, Institutskiy Pereulok 9,
-Dolgoprudny, Moscow, Russia 141700}
+  \author[Smith]{Vasily~Postnicov}
+  \author[Smith,MIT]{Aleksei~Samarin}
+  \author[Smith]{Marina~V.~Karsanina}
+  \author[Aus]{Mathieu~Gravey}
+  \author[MIPT]{Aleksey~Khlyupin}
+  \author[Smith]{Kirill~M.~Gerke\corref{boss}}
+  \cortext[boss]{Corresponding author.\\\textit{E-mail address:} kg@ifz.ru}
 
-\title{Evaluation of classical correlation functions from 2/3D images on CPU and
-  GPU architectures: introducing CorrelationFunctions.jl}
+  \address[Smith]{Schmidt Institute of Physics of the Earth of Russian Academy of
+    Sciences, Moscow, 107031, Russia}
+  \address[MIT]{Computational Mathematics and Cybernetics, Lomonosov Moscow State
+    University, Moscow, 119991, Russia}
+  \address[Aus]{Institute for Interdisciplinary Mountain Research, Austrian
+    Academy of Sciences, Innsbruck, 6020, Austria}
+  \address[MIPT]{Moscow Institute of Physics and Technology, Institutskiy Pereulok 9,
+    Dolgoprudny, Moscow, Russia 141700}
 
-\begin{abstract}
-Correlation functions are becoming one of the major tools for quantification of
-structural information that is usually represented as 2D or 3D image of porous
-material.  In this paper we introduce \code{CorrelationFunctions.jl} open-source
-package developed in Julia and capable of computing all classical correlation
-functions based on imaging input data. Images include both binary and
-multi-phase representations.  Our code is capable of evaluating two-point
-probability $S_2$, phase cross-correlation $\rho_{ij}$, cluster $C_2$,
-lineal-path $L_2$, surface-surface $F_{ss}$, surface-void $F_{sv}$, pore-size
-$P$ and chord-length $p$ distribution functions on both CPU and GPU
-architectures.  Where possible, we presented two types of computations: full
-correlation map (correlations of each point with other points on the image, that
-also allows obtaining ensemble averaged CF) and directional correlation
-functions (currently in major orthogonal and diagonal directions).  Such an
-implementation allowed for the first time to assemble a completely free solution
-to evaluate correlation functions under any operating system with well
-documented application programming interface (API). Our package includes
-automatic tests against analytical solutions that are described in the paper. We
-measured execution times for all CPU and GPU implementations and as a rule of
-thumb full correlation maps on GPU are faster than other methods. However, full
-maps require more RAM and, thus, are limited to available RAM resources. On the
-other hand, directional CFs are memory efficient and can be evaluated for huge
-datasets -- this way they are the first candidates for structural data
-compression of feature extraction. The package itself is available through Julia
-package ecosystem and on GitHub
-(\url{https://github.com/fatimp/CorrelationFunctions.jl}), the latter source
-also contains documentation and additional helpful resources such as tutorials.
-We believe that a single powerful computational tool such as
-\code{CorrelationFunctions.jl} presented in this paper will significantly
-facilitate the usage of correlation functions in numerous areas of structural
-description and research of porous materials, as well as in machine learning
-applications. We also present some example as applied to ceramic, soil composite
-and oil-bearing rock samples based on their 3D X-ray tomography and 2D scanning
-electron microscope images. Finally, we conclude our paper with discussion of
-possible ways to further improve presented computational framework.
+  \begin{abstract}
+    Correlation functions are becoming one of the major tools for quantification
+    of structural information that is usually represented as 2D or 3D images of
+    porous material.  In this paper we introduce \code{CorrelationFunctions.jl}
+    open-source package developed in Julia and capable of computing all
+    classical correlation functions based on imaging input data. Images include
+    both binary and multi-phase representations.  Our code is capable of
+    evaluating two-point probability $S_2$, phase cross-correlation $\rho_{ij}$,
+    cluster $C_2$, lineal-path $L_2$, surface-surface $F_{ss}$, surface-void
+    $F_{sv}$, pore-size $P$ and chord-length $p$ distribution functions on both
+    CPU and GPU architectures.  Where possible, we presented two types of
+    computations: full correlation map (correlations of each point with other
+    points on the image, that also allows obtaining ensemble averaged CF) and
+    directional correlation functions (currently in major orthogonal and
+    diagonal directions).  Such an implementation allowed for the first time to
+    assemble a completely free solution to evaluate correlation functions under
+    any operating system with well documented application programming interface
+    (API). Our package includes automatic tests against analytical solutions
+    that are described in the paper. We measured execution times for all CPU and
+    GPU implementations and as a rule of thumb full correlation maps on GPU are
+    faster than other methods. However, full maps require more RAM and, thus,
+    are limited to available RAM resources. On the other hand, directional CFs
+    are memory efficient and can be evaluated for huge datasets -- this way they
+    are the first candidates for structural data compression of feature
+    extraction. The package itself is available through Julia package ecosystem
+    and on GitHub, the latter source also contains documentation and additional
+    helpful resources such as tutorials.  We believe that a single powerful
+    computational tool such as \code{CorrelationFunctions.jl} presented in this
+    paper will significantly facilitate the usage of correlation functions in
+    numerous areas of structural description and research of porous materials,
+    as well as in machine learning applications. We also present some example as
+    applied to ceramic, soil composite and oil-bearing rock samples based on
+    their 3D X-ray tomography and 2D scanning electron microscope
+    images. Finally, we conclude our paper with discussion of possible ways to
+    further improve presented computational framework.
 \end{abstract}
 
-\maketitle
+  \begin{keyword}
+    3D images; correlation functions; image analysis
+  \end{keyword}
+\end{frontmatter}
+
+{\bf PROGRAM SUMMARY} \\
+\begin{small}
+\noindent
+{\em Program Title:} CorrelationFunctions.jl \\
+{\em CPC Library link to program files:} (to be added by Technical Editor) \\
+{\em Developer's repository link:}
+\url{https://github.com/fatimp/CorrelationFunctions.jl} \\
+{\em Code Ocean capsule:} (to be added by Technical Editor)\\
+{\em Licensing provisions:} MIT \\
+{\em Programming language:} Julia \\
+{\em Supplementary material:} \\
+{\em Nature of problem:} Correlation functions are invaluable universal
+statistical descriptors of structure of porous media used in many scientific
+field such as astronomy, soil physics, hydrology and biology. We propose an open
+source and cross-platform solution for computation of vast majority of
+correlation functions for both 2D and 3D images of porous material. \\
+{\em Solution method:} Our package computes correlation functions using fast
+Fourier transform using such preprocessing steps as cluster labeling or edge
+detection if needed. Almost all of proposed algorithms can be executed on both
+CPU and GPU which results in high execution speed on modern hardware. Two
+approaches to evaluation of correlation functions are proposed: computation of
+correlation maps and computation along predefined directions. These two
+approaches can be thought of as an execution time - memory trade-off. \\
+\end{small}
 
 \section{Background and motivation}
 \label{sec:background}
@@ -1235,5 +1263,6 @@ When a number of trials is calculated as follows:
 Here $n$ is a number of dimensions and $i_k$ is an index into the output array
 for $k$-th dimension.
 
+\bibliographystyle{elsarticle-num}
 \bibliography{apssamp}
 \end{document}
