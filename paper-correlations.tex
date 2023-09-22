@@ -103,19 +103,20 @@
 {\em Code Ocean capsule:} (to be added by Technical Editor)\\
 {\em Licensing provisions:} MIT \\
 {\em Programming language:} Julia \\
-{\em Supplementary material:} \\
+{\em Supplementary material:} Numerous Jupiter notebooks with examples are available on the GitHub page\\
 {\em Nature of problem:} Correlation functions are invaluable universal
-statistical descriptors of structure of porous media used in many scientific
-field such as astronomy, soil physics, hydrology and biology. We propose an open
-source and cross-platform solution for computation of vast majority of
-correlation functions for both 2D and 3D images of porous material. \\
-{\em Solution method:} Our package computes correlation functions using fast
-Fourier transform using such preprocessing steps as cluster labeling or edge
-detection if needed. Almost all of proposed algorithms can be executed on both
-CPU and GPU which results in high execution speed on modern hardware. Two
-approaches to evaluation of correlation functions are proposed: computation of
+statistical descriptors of structures used in numerous scientific
+fields such as astronomy, material science, rock and soil physics, hydrology and biology, to name just a handful of examples. While computational approaches
+are available in the literature for some functions, they are fragmented and are usually implemented in proprietary
+interpreted languages for CPU architecture alone. \\
+{\em Solution method:} We contribute an open
+source and cross-platform solution with well documented API for computation of all classical
+correlation functions from both 2D and 3D images on CPU and GPU architectures. The package computes correlation functions using two approaches: : computation of
 correlation maps and computation along predefined directions. These two
-approaches can be thought of as an execution time - memory trade-off. \\
+approaches can be thought of as an execution time - memory trade-off, but the choice may also depend on the application.
+The computations are based on fast Fourier transform with preprocessing steps as cluster labeling or edge
+detection, and linear scan approach to evaluate correlation functions along predefined directions. Where justified, the algorithms can be executed on both
+CPU and GPU which results in high execution speed on modern hardware. \\
 \end{small}
 
 \section{Background and motivation}
