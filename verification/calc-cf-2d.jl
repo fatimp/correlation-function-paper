@@ -64,11 +64,9 @@ const fns = [
     ("l2", l2_theory,
      img -> Directional.l2(img, false; periodic = true)),
     ("ss", ss_theory,
-     img -> Directional.surfsurf(img, false; periodic = true,
-                                 edgemode = Utilities.EdgesFilterReflect())),
+     img -> Directional.surf2(img, false; periodic = true)),
     ("sv", sv_theory,
-     img -> Directional.surfvoid(img, false; periodic = true,
-                                 edgemode = Utilities.EdgesFilterReflect()))
+     img -> Directional.surfvoid(img, false; periodic = true))
 ]
 
 const hists = [
