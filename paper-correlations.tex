@@ -871,27 +871,27 @@ The package contains automatic tests based on these comparisons.
 \begin{figure*}[tp]
   \centering
   \subfigure[Lineal-path correlation function]{
-    \includegraphics[width=0.3\linewidth]{images/l2.png}
+    \includegraphics[width=0.45\linewidth]{images/l2.png}
     \label{fig:l2}}
   \hfill
   \subfigure[Two-point correlation function]{
-    \includegraphics[width=0.3\linewidth]{images/s2.png}
+    \includegraphics[width=0.45\linewidth]{images/s2.png}
     \label{fig:s2}}
-  \hfill
-  \subfigure[Surface-surface correlation function]{
-    \includegraphics[width=0.3\linewidth]{images/ss.png}
-    \label{fig:ss}}
   \vskip\baselineskip
-  \subfigure[Surface-void correlation function]{
-    \includegraphics[width=0.3\linewidth]{images/sv.png}
-    \label{fig:sv}}
+  \subfigure[Surface-surface correlation function]{
+    \includegraphics[width=0.45\linewidth]{images/ss.png}
+    \label{fig:ss}}
   \hfill
+  \subfigure[Surface-void correlation function]{
+    \includegraphics[width=0.45\linewidth]{images/sv.png}
+    \label{fig:sv}}
+  \vskip\baselineskip
   \subfigure[Pore size correlation function]{
-    \includegraphics[width=0.3\linewidth]{images/ps.png}
+    \includegraphics[width=0.45\linewidth]{images/ps.png}
     \label{fig:ps}}
   \hfill
   \subfigure[Chord length correlation function]{
-    \includegraphics[width=0.3\linewidth]{images/cl.png}
+    \includegraphics[width=0.45\linewidth]{images/cl.png}
     \label{fig:cl}}
   \caption[]{A comparison of calculated and theoretical values of correlation
     functions for overlapping disks and balls.}
@@ -934,23 +934,24 @@ including dimensions and resolutions, can be found in \cref{tab:samples}.
   \label{tab:samples}
 \end{table}
 
-At first, we compare the three ceramic images which have somewhat different
-genesis depending on the mixture ratio of powder and binder used for firing the
-material \cite{ceramics}. As observed from \cref{fig:real-xct}, the structure of
-all three samples is visually very similar. The lineal path function supports
-this observation. The $S_2$ functions are also quite similar except for Sample 2
-having higher porosity that results in elevated curve (the tail for two-point
-probability as expected fluctuates around porosity squared). Notably, $S_2$ and
-$C_2$ are almost identical -- this indicates that pore phase represents a single
-large cluster. Recall that for $S_2$, $C_2$ and $L_2$ functions the value at
-correlation length of 0 is the porosity value. Surface functions, on the other
-hand, feel significant difference between samples in how pore-solid interface is
-organized. This is further evidenced on pore-size and chord-length graphs, with
-Ceramic 2 sample with the highest porosity having larger amount of large
-pores. Both $P$ and $p$ show very similar behavior, but for different
-correlation lengths; such behavior is attributed to quite regular pores shapes
-in all ceramics samples -- this is evident from much larger differences between
-pore-size and chord-length for SEM images considered next.
+At first, we compare the three ceramic images (\cref{fig:real-data}, at the top)
+which have somewhat different genesis depending on the mixture ratio of powder
+and binder used for firing the material \cite{ceramics}. As observed from
+\cref{fig:real-xct-cfs}, the structure of all three samples is visually very
+similar. The lineal path function supports this observation. The $S_2$ functions
+are also quite similar except for Sample 2 having higher porosity that results
+in elevated curve (the tail for two-point probability as expected fluctuates
+around porosity squared). Notably, $S_2$ and $C_2$ are almost identical -- this
+indicates that pore phase represents a single large cluster. Recall that for
+$S_2$, $C_2$ and $L_2$ functions the value at correlation length of 0 is the
+porosity value. Surface functions, on the other hand, feel significant
+difference between samples in how pore-solid interface is organized. This is
+further evidenced on pore-size and chord-length graphs, with Ceramic 2 sample
+with the highest porosity having larger amount of large pores. Both $P$ and $p$
+show very similar behavior, but for different correlation lengths; such behavior
+is attributed to quite regular pores shapes in all ceramics samples -- this is
+evident from much larger differences between pore-size and chord-length for SEM
+images considered next.
 
 \begin{figure*}[pt]
   \centering
@@ -963,50 +964,6 @@ pore-size and chord-length for SEM images considered next.
   \subfigure[Ceramic 3]{
     \includegraphics[width=0.3\linewidth]{samples/Ceramic3.png}}
   \vskip\baselineskip
-  \includegraphics[width=0.32\linewidth]{samples/s2-xct.png}
-  \includegraphics[width=0.32\linewidth]{samples/c2-xct.png}
-  \includegraphics[width=0.32\linewidth]{samples/l2-xct.png}
-  \vskip\baselineskip
-  \includegraphics[width=0.32\linewidth]{samples/surf2-xct.png}
-  \includegraphics[width=0.32\linewidth]{samples/surfvoid-xct.png}
-  \vskip\baselineskip
-  \includegraphics[width=0.32\linewidth]{samples/pore-size-xct.png}
-  \includegraphics[width=0.32\linewidth]{samples/chord-length-xct.png}
-  \caption[]{Visualization of XCT images and plots of correlation functions for
-    these images.}
-  \label{fig:real-xct}
-\end{figure*}
-
-The \cref{fig:real-sem} presents three 2D images of sandstones and carbonate
-with computed correlation functions. In this example, unlike for quite isotropic
-ceramics, we evaluated CFs in the directional manner. The $S_2$ graph
-immediately provides us with porosity values. It also highlights severe
-anisotropy in sandstone SEM images. For 2D images numerous patches of pores are
-not connected to each other and, thus, $S_2$ and $C_2$ are very
-different. Cluster functions show how connectivity decays with length, also we
-can easily observe if given pore structure percolates in a given direction -
-none of the images percolates (we highlighted the clusters to make this
-statement easily verifiable with the naked eye). Note that $C_2$ and $L_2$ were
-computed with correlations lengths equal to image dimensions explore
-connectivity -- for other CFs this leads to noised curves due to smaller number
-of sampled points (for example, see correlation functions' graphs in
-\cite{Euras2012}).  Lineal paths are close for sandstones (with lower $L_2$
-values for Sandstone 1 where large pores are occluded with clays or grain
-fragments), but for carbonate with much smaller apertures of pores it is way
-below $L_2$ for sandstones. Also, $L_2$ suggests that computations with
-correlations lengths beyond where lineal path goes to zero are not very
-informative. For very irregular pores on 2D SEM images, $P$ and $p$ functions
-look much less similar compared to the ceramics case on \cref{fig:real-xct}. For
-2D images it is also visually easy to analyze full CF maps, as presented on
-\cref{fig:real-sem-map} for Sandstone 1 sample. Full correlation maps show
-expanded version of directional functions -- asymmetry is immediately evidenced
-from $S_2$, $F_{ss}$ and $F_{sv}$ maps. Moreover, the map for $C_2$ shows higher
-connectivity in y-direction as compared to x-axis. The interpretation of full
-correlation maps is less straightforward, but anisotropy patterns in directions
-different from those presented in \cref{fig:directions} can be spotted.
-
-\begin{figure*}[pt]
-  \centering
   \subfigure[Sandstone 1]{
     \includegraphics[width=0.3\linewidth, frame]{samples/sandstone1.png}}
   \hfill
@@ -1015,19 +972,77 @@ different from those presented in \cref{fig:directions} can be spotted.
   \hfill
   \subfigure[Carbonate 1]{
     \includegraphics[width=0.3\linewidth, frame]{samples/carbonate1.png}}
+  \caption[]{Visualization of XCT (top) and SEM (bottom) images used for
+    computation of correlation functions. Different clusters of the void phase
+    on SEM samples are shown in color.}
+  \label{fig:real-data}
+\end{figure*}
+\begin{figure*}[pt]
+  \centering
+  \includegraphics[width=0.45\linewidth]{samples/s2-xct.png}
+  \hfill
+  \includegraphics[width=0.45\linewidth]{samples/c2-xct.png}
   \vskip\baselineskip
-  \includegraphics[width=0.32\linewidth]{samples/s2-sem.png}
-  \includegraphics[width=0.32\linewidth]{samples/c2-sem.png}
-  \includegraphics[width=0.32\linewidth]{samples/l2-sem.png}
+  \includegraphics[width=0.45\linewidth]{samples/l2-xct.png}
   \vskip\baselineskip
-  \includegraphics[width=0.32\linewidth]{samples/surf2-sem.png}
-  \includegraphics[width=0.32\linewidth]{samples/surfvoid-sem.png}
+  \includegraphics[width=0.45\linewidth]{samples/surf2-xct.png}
+  \hfill
+  \includegraphics[width=0.45\linewidth]{samples/surfvoid-xct.png}
   \vskip\baselineskip
-  \includegraphics[width=0.32\linewidth]{samples/pore-size-sem.png}
-  \includegraphics[width=0.32\linewidth]{samples/chord-length-sem.png}
-  \caption[]{SEM images and plots of correlation functions for these
-    images. Different clusters of the void phase are shown in color.}
-  \label{fig:real-sem}
+  \includegraphics[width=0.45\linewidth]{samples/pore-size-xct.png}
+  \hfill
+  \includegraphics[width=0.45\linewidth]{samples/chord-length-xct.png}
+  \caption[]{Plots of correlation functions for XCT samples on
+    \cref{fig:real-data}.}
+  \label{fig:real-xct-cfs}
+\end{figure*}
+
+The \cref{fig:real-data} (at the bottom) presents three 2D images of sandstones
+and carbonate with computed correlation functions at \cref{fig:real-sem-cfs}. In
+this example, unlike for quite isotropic ceramics, we evaluated CFs in the
+directional manner. The $S_2$ graph immediately provides us with porosity
+values. It also highlights severe anisotropy in sandstone SEM images. For 2D
+images numerous patches of pores are not connected to each other and, thus,
+$S_2$ and $C_2$ are very different. Cluster functions show how connectivity
+decays with length, also we can easily observe if given pore structure
+percolates in a given direction - none of the images percolates (we highlighted
+the clusters to make this statement easily verifiable with the naked eye). Note
+that $C_2$ and $L_2$ were computed with correlations lengths equal to image
+dimensions explore connectivity -- for other CFs this leads to noised curves due
+to smaller number of sampled points (for example, see correlation functions'
+graphs in \cite{Euras2012}).  Lineal paths are close for sandstones (with lower
+$L_2$ values for Sandstone 1 where large pores are occluded with clays or grain
+fragments), but for carbonate with much smaller apertures of pores it is way
+below $L_2$ for sandstones. Also, $L_2$ suggests that computations with
+correlations lengths beyond where lineal path goes to zero are not very
+informative. For very irregular pores on 2D SEM images, $P$ and $p$ functions
+look much less similar compared to the ceramics case on
+\cref{fig:real-xct-cfs}. For 2D images it is also visually easy to analyze full
+CF maps, as presented on \cref{fig:real-sem-map} for Sandstone 1 sample. Full
+correlation maps show expanded version of directional functions -- asymmetry is
+immediately evidenced from $S_2$, $F_{ss}$ and $F_{sv}$ maps. Moreover, the map
+for $C_2$ shows higher connectivity in y-direction as compared to x-axis. The
+interpretation of full correlation maps is less straightforward, but anisotropy
+patterns in directions different from those presented in \cref{fig:directions}
+can be spotted.
+\begin{figure*}[pt]
+  \centering
+  \includegraphics[width=0.45\linewidth]{samples/s2-sem.png}
+  \hfill
+  \includegraphics[width=0.45\linewidth]{samples/c2-sem.png}
+  \vskip\baselineskip
+  \includegraphics[width=0.45\linewidth]{samples/l2-sem.png}
+  \vskip\baselineskip
+  \includegraphics[width=0.45\linewidth]{samples/surf2-sem.png}
+  \hfill
+  \includegraphics[width=0.45\linewidth]{samples/surfvoid-sem.png}
+  \vskip\baselineskip
+  \includegraphics[width=0.45\linewidth]{samples/pore-size-sem.png}
+  \hfill
+  \includegraphics[width=0.45\linewidth]{samples/chord-length-sem.png}
+  \caption[]{Plots of correlation functions for SEM samples on
+    \cref{fig:real-data}}
+  \label{fig:real-sem-cfs}
 \end{figure*}
 
 \begin{figure*}[pt]
