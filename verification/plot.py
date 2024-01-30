@@ -18,7 +18,7 @@ plt.xlabel('Correlation length $r$')
 plt.ylabel('Two point function $S_2(r)$')
 plt.legend(['CorrelationFunctions.jl (2D)', 'Theory (2D)',
             'CorrelationFunctions.jl (3D)', 'Theory (3D)'])
-plt.savefig('s2.png')
+plt.savefig('s2.png', bbox_inches = 'tight')
 
 l2_2d = np.loadtxt('l2-2d.dat')
 l2_3d = np.loadtxt('l2-3d.dat')
@@ -35,7 +35,7 @@ plt.xlabel('Correlation length $r$')
 plt.ylabel('Lineal-path function $L_2(r)$')
 plt.legend(['CorrelationFunctions.jl (2D)', 'Theory (2D)',
             'CorrelationFunctions.jl (3D)', 'Theory (3D)'])
-plt.savefig('l2.png')
+plt.savefig('l2.png', bbox_inches = 'tight')
 
 ss_2d = np.loadtxt('ss-2d.dat')
 ss_3d = np.loadtxt('ss-3d.dat')
@@ -52,7 +52,7 @@ plt.xlabel('Correlation length $r$')
 plt.ylabel('Surface-surface function $F_{ss}(r)$')
 plt.legend(['CorrelationFunctions.jl (2D)', 'Theory (2D)',
             'CorrelationFunctions.jl (3D)', 'Theory (3D)'])
-plt.savefig('ss.png')
+plt.savefig('ss.png', bbox_inches = 'tight')
 
 sv_2d = np.loadtxt('sv-2d.dat')
 sv_3d = np.loadtxt('sv-3d.dat')
@@ -69,7 +69,7 @@ plt.xlabel('Correlation length $r$')
 plt.ylabel('Surface-void function $F_{sv}(r)$')
 plt.legend(['CorrelationFunctions.jl (2D)', 'Theory (2D)',
             'CorrelationFunctions.jl (3D)', 'Theory (3D)'])
-plt.savefig('sv.png')
+plt.savefig('sv.png', bbox_inches = 'tight')
 
 ps_hist_2d = np.loadtxt('pore_size-2d-hist.dat')
 ps_prob_2d = np.loadtxt('pore_size-2d-prob.dat')
@@ -88,7 +88,7 @@ plt.xlabel('Pore size $r$')
 plt.ylabel('Pore size function $P(r)$')
 plt.legend(['Theory (2D)', 'Theory (3D)',
             'CorrelationFunctions.jl (2D)', 'CorrelationFunctions.jl (3D)'])
-plt.savefig('ps.png')
+plt.savefig('ps.png', bbox_inches = 'tight')
 
 cl_hist_2d = np.loadtxt('chord_length-2d-hist.dat')
 cl_prob_2d = np.loadtxt('chord_length-2d-prob.dat')
@@ -107,4 +107,4 @@ plt.xlabel('Chord length $r$')
 plt.ylabel('Chord length function $p(r)$')
 plt.legend(['Theory (2D)', 'Theory (3D)',
             'CorrelationFunctions.jl (2D)', 'CorrelationFunctions.jl (3D)'])
-plt.savefig('cl.png')
+plt.savefig('cl.png', bbox_inches = 'tight')
